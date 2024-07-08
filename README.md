@@ -95,7 +95,7 @@
 
                     // Add a gap after each paragraph for smooth cursor movement
                     const gap = document.createElement('div');
-                    gap.innerHTML = '<br>';
+                    gap.innerHTML = '<br><br>'; // Add larger gap
                     outputContainer.appendChild(gap);
                 }
             });
