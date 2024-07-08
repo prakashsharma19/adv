@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -93,13 +94,13 @@
                         // Copy the text with formatting
                         const tempDiv = document.createElement('div');
                         tempDiv.appendChild(newRange.cloneContents());
+                        const textToCopy = tempDiv.innerHTML;
                         document.body.appendChild(tempDiv);
 
-                        const textToCopy = tempDiv.innerHTML;
                         const tempTextarea = document.createElement('textarea');
                         tempTextarea.style.position = 'fixed';
                         tempTextarea.style.opacity = '0';
-                        tempTextarea.value = textToCopy;
+                        tempTextarea.value = parentParagraph.innerHTML.replace(/<br>/g, '\n');
 
                         document.body.appendChild(tempTextarea);
                         tempTextarea.select();
