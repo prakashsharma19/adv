@@ -20,6 +20,9 @@
             cursor: text;
             white-space: pre-wrap; /* Maintain text format */
         }
+        .text-container p {
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -33,32 +36,33 @@
     <script>
         function processText() {
             const inputText = document.getElementById('inputText').value;
+            const paragraphs = inputText.split('\n\n');
             const outputContainer = document.getElementById('output');
-            outputContainer.textContent = inputText;
+            outputContainer.innerHTML = '';
+
+            paragraphs.forEach(paragraph => {
+                if (paragraph.trim() !== '') {
+                    const p = document.createElement('p');
+                    p.textContent = paragraph.trim();
+                    outputContainer.appendChild(p);
+                }
+            });
         }
 
         document.addEventListener('click', function(event) {
             const outputContainer = document.getElementById('output');
-            const selection = window.getSelection();
 
-            if (event.target.closest('#output') && selection.rangeCount && event.shiftKey) {
-                const range = selection.getRangeAt(0);
-                const startNode = range.startContainer;
-                let endNode = range.endContainer;
-
-                while (endNode !== outputContainer && endNode.nodeName !== 'BR' && endNode.textContent.trim() === '') {
-                    endNode = endNode.parentNode;
-                }
-
-                const newRange = document.createRange();
-                newRange.setStart(startNode, range.startOffset);
-                newRange.setEnd(endNode, endNode.textContent.length);
-
+            if (event.target.closest('.text-container') && event.target.nodeName === 'P' && event.shiftKey) {
+                const paragraph = event.target;
+                const range = document.createRange();
+                range.selectNodeContents(paragraph);
+                const selection = window.getSelection();
                 selection.removeAllRanges();
-                selection.addRange(newRange);
-
+                selection.addRange(range);
+                
+                // Automatically copy and cut the text
                 document.execCommand('copy');
-                document.execCommand('cut');
+                paragraph.remove();
             }
         });
     </script>
