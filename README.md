@@ -71,29 +71,6 @@
             updateCount();
         }
 
-        document.addEventListener('selectionchange', function() {
-            const selection = window.getSelection();
-            const outputContainer = document.getElementById('output');
-
-            if (selection.rangeCount && outputContainer.contains(selection.anchorNode)) {
-                const range = selection.getRangeAt(0);
-                const startNode = range.startContainer;
-                let endNode = range.endContainer;
-
-                if (startNode !== endNode) {
-                    while (endNode !== outputContainer && endNode.nodeName !== 'P') {
-                        endNode = endNode.parentNode;
-                    }
-
-                    const newRange = document.createRange();
-                    newRange.setStart(startNode, range.startOffset);
-                    newRange.setEnd(endNode, endNode.textContent.length);
-                    selection.removeAllRanges();
-                    selection.addRange(newRange);
-                }
-            }
-        });
-
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Shift' && window.getSelection().toString() !== '') {
                 const selection = window.getSelection();
@@ -103,9 +80,9 @@
                 // Copy the text with formatting
                 const tempDiv = document.createElement('div');
                 tempDiv.appendChild(range.cloneContents());
+                const textToCopy = tempDiv.innerHTML;
                 document.body.appendChild(tempDiv);
 
-                const textToCopy = tempDiv.innerHTML;
                 const tempTextarea = document.createElement('textarea');
                 tempTextarea.style.position = 'fixed';
                 tempTextarea.style.opacity = '0';
