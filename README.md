@@ -123,6 +123,9 @@
 
                 if (paragraph && paragraph.textContent.includes('Professor')) {
                     cutParagraph(paragraph);
+
+                    // Set focus back to the text container after cutting
+                    document.getElementById('output').focus();
                 }
             }
         }
@@ -133,7 +136,8 @@
 
         document.getElementById('output').addEventListener('click', function(event) {
             if (event.target.id === 'cursorStart') {
-                setTimeout(startMonitoring, 500); // Start monitoring cursor after a short delay
+                document.getElementById('cursorStart').innerHTML = ''; // Remove the placeholder text
+                startMonitoring(); // Start monitoring cursor after clicking in the text container
             }
         });
     </script>
