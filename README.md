@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -24,12 +25,15 @@
         .text-container p {
             margin: 10px 0;
         }
-        #entryCount {
+        #entryCount, #countryCount {
             position: absolute;
             top: 20px;
             right: 20px;
             font-size: 18px;
             font-weight: bold;
+        }
+        #countryCount {
+            top: 50px;
         }
     </style>
 </head>
@@ -41,17 +45,41 @@
     </div>
     <div id="output" class="text-container" contenteditable="true"></div>
     <div id="entryCount">Total Entries: 0</div>
+    <div id="countryCount">Country Counts:</div>
 
     <script>
+        const countries = ["USA", "Canada", "UK", "India", "Korea", "Germany", "France", "China", "Japan", "Australia"];
+        
         function countOccurrences(text, word) {
             const regex = new RegExp(`\\b${word}\\b`, 'gi');
             return (text.match(regex) || []).length;
         }
 
+        function countCountries(text) {
+            const countryCounts = {};
+            countries.forEach(country => {
+                const regex = new RegExp(`\\b${country}\\b`, 'gi');
+                const count = (text.match(regex) || []).length;
+                if (count > 0) {
+                    countryCounts[country] = count;
+                }
+            });
+            return countryCounts;
+        }
+
         function updateCount() {
             const outputContainer = document.getElementById('output');
-            const count = countOccurrences(outputContainer.innerText, 'professor');
-            document.getElementById('entryCount').innerText = `Total Entries: ${count}`;
+            const text = outputContainer.innerText;
+
+            const professorCount = countOccurrences(text, 'professor');
+            document.getElementById('entryCount').innerText = `Total Entries: ${professorCount}`;
+
+            const countryCounts = countCountries(text);
+            let countryCountText = "Country Counts:<br>";
+            for (const [country, count] of Object.entries(countryCounts)) {
+                countryCountText += `${country}: ${count}<br>`;
+            }
+            document.getElementById('countryCount').innerHTML = countryCountText;
         }
 
         function processText() {
