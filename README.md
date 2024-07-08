@@ -97,7 +97,7 @@
                     // Add a gap after every email for smooth cursor movement
                     if (paragraph.includes('@')) {
                         const gap = document.createElement('div');
-                        gap.innerHTML = '<br><br>';
+                        gap.innerHTML = '<br>';
                         outputContainer.appendChild(gap);
                     }
                 }
@@ -130,11 +130,22 @@
             document.body.removeChild(tempTextarea);
             document.body.removeChild(tempDiv);
 
-            // Remove the paragraph
+            // Remove the paragraph and cleanup
             paragraph.remove();
+            cleanupSpaces();
 
             // Update the count
             updateCount();
+        }
+
+        function cleanupSpaces() {
+            const outputContainer = document.getElementById('output');
+            const paragraphs = outputContainer.querySelectorAll('p, div');
+            paragraphs.forEach(paragraph => {
+                if (!paragraph.innerText.trim()) {
+                    paragraph.remove();
+                }
+            });
         }
 
         function handleCursorMovement(event) {
