@@ -71,34 +71,49 @@
             updateCount();
         }
 
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Shift' && window.getSelection().toString() !== '') {
-                const selection = window.getSelection();
+        document.addEventListener('mouseup', function(event) {
+            const outputContainer = document.getElementById('output');
+            const selection = window.getSelection();
+
+            if (outputContainer.contains(event.target) && selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0);
-                const paragraph = range.startContainer.nodeName === 'P' ? range.startContainer : range.startContainer.parentNode;
+                const startNode = range.startContainer;
+                const parentParagraph = startNode.nodeType === Node.TEXT_NODE ? startNode.parentNode : startNode;
 
-                // Copy the text with formatting
-                const tempDiv = document.createElement('div');
-                tempDiv.appendChild(range.cloneContents());
-                const textToCopy = tempDiv.innerHTML;
-                document.body.appendChild(tempDiv);
+                if (parentParagraph.nodeName === 'P' && parentParagraph.textContent.includes('Professor')) {
+                    const regex = /\bProfessor\b/gi;
+                    const match = regex.exec(parentParagraph.textContent);
 
-                const tempTextarea = document.createElement('textarea');
-                tempTextarea.style.position = 'fixed';
-                tempTextarea.style.opacity = '0';
-                tempTextarea.value = textToCopy;
+                    if (match) {
+                        const newRange = document.createRange();
+                        newRange.selectNodeContents(parentParagraph);
+                        selection.removeAllRanges();
+                        selection.addRange(newRange);
 
-                document.body.appendChild(tempTextarea);
-                tempTextarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(tempTextarea);
-                document.body.removeChild(tempDiv);
+                        // Copy the text with formatting
+                        const tempDiv = document.createElement('div');
+                        tempDiv.appendChild(newRange.cloneContents());
+                        document.body.appendChild(tempDiv);
 
-                // Remove the paragraph
-                paragraph.remove();
+                        const textToCopy = tempDiv.innerHTML;
+                        const tempTextarea = document.createElement('textarea');
+                        tempTextarea.style.position = 'fixed';
+                        tempTextarea.style.opacity = '0';
+                        tempTextarea.value = textToCopy;
 
-                // Update the count
-                updateCount();
+                        document.body.appendChild(tempTextarea);
+                        tempTextarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tempTextarea);
+                        document.body.removeChild(tempDiv);
+
+                        // Remove the paragraph
+                        parentParagraph.remove();
+
+                        // Update the count
+                        updateCount();
+                    }
+                }
             }
         });
     </script>
