@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -94,12 +93,10 @@
                     p.innerHTML = paragraph.replace(/\n/g, '<br>');
                     outputContainer.appendChild(p);
 
-                    // Add a gap after every email for smooth cursor movement
-                    if (paragraph.includes('@')) {
-                        const gap = document.createElement('div');
-                        gap.innerHTML = '<br>';
-                        outputContainer.appendChild(gap);
-                    }
+                    // Add a gap after each paragraph for smooth cursor movement
+                    const gap = document.createElement('div');
+                    gap.innerHTML = '<br>';
+                    outputContainer.appendChild(gap);
                 }
             });
 
