@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -129,7 +128,7 @@
         document.addEventListener('mouseup', function(event) {
             const outputContainer = document.getElementById('output');
             if (outputContainer.contains(event.target)) {
-                monitorCursor();
+                setTimeout(monitorCursor, 500); // Start monitoring cursor after a short delay
             }
         });
     </script>
