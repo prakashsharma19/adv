@@ -72,49 +72,64 @@
             updateCount();
         }
 
-        document.addEventListener('mouseup', function(event) {
-            const outputContainer = document.getElementById('output');
+        function cutParagraph(paragraph) {
             const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(paragraph);
+            selection.removeAllRanges();
+            selection.addRange(range);
 
-            if (outputContainer.contains(event.target) && selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                const startNode = range.startContainer;
-                const parentParagraph = startNode.nodeType === Node.TEXT_NODE ? startNode.parentNode : startNode;
+            // Copy the text with formatting
+            const tempDiv = document.createElement('div');
+            tempDiv.appendChild(range.cloneContents());
+            const textToCopy = tempDiv.innerHTML;
+            document.body.appendChild(tempDiv);
 
-                if (parentParagraph.nodeName === 'P' && parentParagraph.textContent.includes('Professor')) {
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.style.position = 'fixed';
+            tempTextarea.style.opacity = '0';
+            tempTextarea.value = paragraph.innerHTML.replace(/<br>/g, '\n');
+
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+            document.body.removeChild(tempDiv);
+
+            // Remove the paragraph
+            paragraph.remove();
+
+            // Update the count
+            updateCount();
+        }
+
+        function monitorCursor() {
+            const outputContainer = document.getElementById('output');
+            const paragraphs = outputContainer.getElementsByTagName('p');
+            let cursorPos = 0;
+
+            function moveCursor() {
+                if (cursorPos < paragraphs.length) {
+                    const paragraph = paragraphs[cursorPos];
                     const regex = /\bProfessor\b/gi;
-                    const match = regex.exec(parentParagraph.textContent);
+                    const match = regex.exec(paragraph.textContent);
 
                     if (match) {
-                        const newRange = document.createRange();
-                        newRange.selectNodeContents(parentParagraph);
-                        selection.removeAllRanges();
-                        selection.addRange(newRange);
-
-                        // Copy the text with formatting
-                        const tempDiv = document.createElement('div');
-                        tempDiv.appendChild(newRange.cloneContents());
-                        const textToCopy = tempDiv.innerHTML;
-                        document.body.appendChild(tempDiv);
-
-                        const tempTextarea = document.createElement('textarea');
-                        tempTextarea.style.position = 'fixed';
-                        tempTextarea.style.opacity = '0';
-                        tempTextarea.value = parentParagraph.innerHTML.replace(/<br>/g, '\n');
-
-                        document.body.appendChild(tempTextarea);
-                        tempTextarea.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(tempTextarea);
-                        document.body.removeChild(tempDiv);
-
-                        // Remove the paragraph
-                        parentParagraph.remove();
-
-                        // Update the count
-                        updateCount();
+                        cutParagraph(paragraph);
                     }
+
+                    cursorPos++;
+                    setTimeout(moveCursor, 100); // Adjust the timeout as needed
                 }
+            }
+
+            moveCursor();
+        }
+
+        document.addEventListener('mouseup', function(event) {
+            const outputContainer = document.getElementById('output');
+            if (outputContainer.contains(event.target)) {
+                monitorCursor();
             }
         });
     </script>
