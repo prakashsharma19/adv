@@ -58,7 +58,7 @@
             const inputText = document.getElementById('inputText').value;
             const paragraphs = inputText.split('\n\n');
             const outputContainer = document.getElementById('output');
-            outputContainer.innerHTML = '';
+            outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
 
             paragraphs.forEach(paragraph => {
                 if (paragraph.trim() !== '') {
@@ -109,34 +109,31 @@
             updateCount();
         }
 
-        function monitorCursor() {
-            const outputContainer = document.getElementById('output');
-            const paragraphs = outputContainer.getElementsByTagName('p');
-            let cursorPos = 0;
+        function handleCursorMovement(event) {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const container = range.commonAncestorContainer;
 
-            function moveCursor() {
-                if (cursorPos < paragraphs.length) {
-                    const paragraph = paragraphs[cursorPos];
-                    const regex = /\bProfessor\b/gi;
-                    const match = regex.exec(paragraph.textContent);
+                // Check if the cursor is inside a paragraph containing "Professor"
+                let paragraph = container;
+                while (paragraph && paragraph.nodeName !== 'P') {
+                    paragraph = paragraph.parentNode;
+                }
 
-                    if (match) {
-                        cutParagraph(paragraph);
-                        cursorPos--; // Adjust position after cutting
-                    }
-
-                    cursorPos++;
-                    setTimeout(moveCursor, 100); // Adjust the timeout as needed
+                if (paragraph && paragraph.textContent.includes('Professor')) {
+                    cutParagraph(paragraph);
                 }
             }
-
-            moveCursor();
         }
 
-        document.addEventListener('mouseup', function(event) {
-            const outputContainer = document.getElementById('output');
-            if (outputContainer.contains(event.target)) {
-                setTimeout(monitorCursor, 500); // Start monitoring cursor after a short delay
+        function startMonitoring() {
+            document.addEventListener('keyup', handleCursorMovement);
+        }
+
+        document.getElementById('output').addEventListener('click', function(event) {
+            if (event.target.id === 'cursorStart') {
+                setTimeout(startMonitoring, 500); // Start monitoring cursor after a short delay
             }
         });
     </script>
