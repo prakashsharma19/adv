@@ -65,6 +65,13 @@
                     const p = document.createElement('p');
                     p.innerHTML = paragraph.replace(/\n/g, '<br>');
                     outputContainer.appendChild(p);
+
+                    // Add a gap after every email for smooth cursor movement
+                    if (paragraph.includes('@')) {
+                        const gap = document.createElement('div');
+                        gap.innerHTML = '<br><br>';
+                        outputContainer.appendChild(gap);
+                    }
                 }
             });
 
@@ -115,6 +122,7 @@
 
                     if (match) {
                         cutParagraph(paragraph);
+                        cursorPos--; // Adjust position after cutting
                     }
 
                     cursorPos++;
