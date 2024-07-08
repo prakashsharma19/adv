@@ -63,7 +63,7 @@
             paragraphs.forEach(paragraph => {
                 if (paragraph.trim() !== '') {
                     const p = document.createElement('p');
-                    p.textContent = paragraph.trim();
+                    p.innerHTML = paragraph.replace(/\n/g, '<br>');
                     outputContainer.appendChild(p);
                 }
             });
@@ -100,9 +100,27 @@
                 const range = selection.getRangeAt(0);
                 const paragraph = range.startContainer.nodeName === 'P' ? range.startContainer : range.startContainer.parentNode;
 
-                // Automatically copy and cut the text
+                // Copy the text with formatting
+                const tempDiv = document.createElement('div');
+                tempDiv.appendChild(range.cloneContents());
+                document.body.appendChild(tempDiv);
+
+                const textToCopy = tempDiv.innerHTML;
+                const tempTextarea = document.createElement('textarea');
+                tempTextarea.style.position = 'fixed';
+                tempTextarea.style.opacity = '0';
+                tempTextarea.value = textToCopy;
+
+                document.body.appendChild(tempTextarea);
+                tempTextarea.select();
                 document.execCommand('copy');
+                document.body.removeChild(tempTextarea);
+                document.body.removeChild(tempDiv);
+
+                // Remove the paragraph
                 paragraph.remove();
+
+                // Update the count
                 updateCount();
             }
         });
