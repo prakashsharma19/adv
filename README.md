@@ -8,6 +8,7 @@
             font-family: Arial, sans-serif;
             background-color: #ADD8E6; /* Light blue background color */
             padding: 20px;
+            position: relative;
         }
         .input-container {
             margin-bottom: 20px;
@@ -23,6 +24,13 @@
         .text-container p {
             margin: 10px 0;
         }
+        #entryCount {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -32,8 +40,20 @@
         <button onclick="processText()">OK</button>
     </div>
     <div id="output" class="text-container" contenteditable="true"></div>
+    <div id="entryCount">Total Entries: 0</div>
 
     <script>
+        function countOccurrences(text, word) {
+            const regex = new RegExp(`\\b${word}\\b`, 'gi');
+            return (text.match(regex) || []).length;
+        }
+
+        function updateCount() {
+            const outputContainer = document.getElementById('output');
+            const count = countOccurrences(outputContainer.innerText, 'professor');
+            document.getElementById('entryCount').innerText = `Total Entries: ${count}`;
+        }
+
         function processText() {
             const inputText = document.getElementById('inputText').value;
             const paragraphs = inputText.split('\n\n');
@@ -47,22 +67,43 @@
                     outputContainer.appendChild(p);
                 }
             });
+
+            updateCount();
         }
 
-        document.addEventListener('click', function(event) {
+        document.addEventListener('selectionchange', function() {
+            const selection = window.getSelection();
             const outputContainer = document.getElementById('output');
 
-            if (event.target.closest('.text-container') && event.target.nodeName === 'P' && event.shiftKey) {
-                const paragraph = event.target;
-                const range = document.createRange();
-                range.selectNodeContents(paragraph);
+            if (selection.rangeCount && outputContainer.contains(selection.anchorNode)) {
+                const range = selection.getRangeAt(0);
+                const startNode = range.startContainer;
+                let endNode = range.endContainer;
+
+                if (startNode !== endNode) {
+                    while (endNode !== outputContainer && endNode.nodeName !== 'P') {
+                        endNode = endNode.parentNode;
+                    }
+
+                    const newRange = document.createRange();
+                    newRange.setStart(startNode, range.startOffset);
+                    newRange.setEnd(endNode, endNode.textContent.length);
+                    selection.removeAllRanges();
+                    selection.addRange(newRange);
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Shift' && window.getSelection().toString() !== '') {
                 const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-                
+                const range = selection.getRangeAt(0);
+                const paragraph = range.startContainer.nodeName === 'P' ? range.startContainer : range.startContainer.parentNode;
+
                 // Automatically copy and cut the text
                 document.execCommand('copy');
                 paragraph.remove();
+                updateCount();
             }
         });
     </script>
