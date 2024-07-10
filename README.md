@@ -26,10 +26,14 @@
         .text-container p {
             margin: 10px 0;
         }
-        #adCount, #countryCount {
+        #adCount {
             margin-left: 20px;
             font-size: 18px;
             font-weight: bold;
+        }
+        #countryCount {
+            margin-left: 20px;
+            font-size: 16px;
         }
         .font-controls {
             margin-bottom: 10px;
@@ -141,9 +145,9 @@
 
             let countryCountText = '';
             for (const country in countryCounts) {
-                countryCountText += `${country}: ${countryCounts[country]}<br>`;
+                countryCountText += `${country}: ${countryCounts[country]}; `;
             }
-            document.getElementById('countryCount').innerHTML = countryCountText;
+            document.getElementById('countryCount').innerHTML = countryCountText.trim();
         }
 
         function processText() {
