@@ -32,7 +32,7 @@
             font-weight: bold;
         }
         #countryCount {
-            margin-top: 10px;
+            margin-left: 20px;
             font-size: 16px;
         }
         .font-controls {
@@ -73,9 +73,6 @@
         #credits a:hover {
             text-decoration: underline;
         }
-        .country-name {
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -97,9 +94,7 @@
         <button id="okButton" onclick="processText()">OK</button>
         <div id="adCount">Total Advertisements: 0</div>
     </div>
-    <div id="output" class="text-container" contenteditable="true">
-        <p id="cursorStart"><b>Place your cursor here</b></p>
-    </div>
+    <div id="output" class="text-container" contenteditable="true"></div>
     <div id="countryCount"></div>
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
@@ -141,86 +136,40 @@
             document.getElementById('adCount').innerText = `Total Advertisements: ${adCount}`;
 
             const countryCounts = {};
-            const paragraphs = outputContainer.querySelectorAll('p');
-            paragraphs.forEach(paragraph => {
-                const paragraphText = paragraph.textContent.trim();
-                const emailIndex = paragraphText.lastIndexOf('@');
-                if (emailIndex !== -1) {
-                    const textBeforeEmail = paragraphText.substring(0, emailIndex);
-                    countryList.forEach(country => {
-                        const count = countOccurrences(textBeforeEmail, country);
-                        if (count > 0) {
-                            if (!countryCounts[country]) {
-                                countryCounts[country] = 0;
-                            }
-                            countryCounts[country] += count;
-                        }
-                    });
+            countryList.forEach(country => {
+                const count = countOccurrences(text, country);
+                if (count > 0) {
+                    countryCounts[country] = count;
                 }
             });
 
             let countryCountText = '';
             for (const country in countryCounts) {
-                countryCountText += `<span class="country-name">${country}:</span> ${countryCounts[country]}; `;
+                countryCountText += `${country}: ${countryCounts[country]}; `;
             }
-            document.getElementById('countryCount').innerHTML = countryCountText;
+            document.getElementById('countryCount').innerHTML = countryCountText.trim();
         }
 
         function processText() {
             const inputText = document.getElementById('inputText').value;
-            const outputContainer = document.getElementById('output');
-            outputContainer.innerHTML = ''; // Clear previous content
-
             const paragraphs = inputText.split('\n\n');
-            paragraphs.forEach(paragraphText => {
-                const paragraph = document.createElement('p');
-                paragraph.innerHTML = paragraphText.replace(/\n/g, '<br>');
-                outputContainer.appendChild(paragraph);
+            const outputContainer = document.getElementById('output');
+            outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
+
+            paragraphs.forEach(paragraph => {
+                if (paragraph.trim() !== '') {
+                    const p = document.createElement('p');
+                    p.innerHTML = paragraph.replace(/\n/g, '<br>');
+                    outputContainer.appendChild(p);
+
+                    // Add a gap after each paragraph for smooth cursor movement
+                    const gap = document.createElement('div');
+                    gap.innerHTML = '<br><br>'; // Add larger gap
+                    outputContainer.appendChild(gap);
+                }
             });
 
             updateCounts();
-            document.getElementById('output').focus();
-            const range = document.createRange();
-            const sel = window.getSelection();
-            range.setStart(paragraph.childNodes[0], 0);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        }
-
-        function updateFont() {
-            const fontStyle = document.getElementById('fontStyle').value;
-            const fontSize = document.getElementById('fontSize').value;
-            document.getElementById('output').style.fontFamily = fontStyle;
-            document.getElementById('output').style.fontSize = `${fontSize}px`;
-        }
-
-        document.getElementById('output').addEventListener('click', function(event) {
-            if (event.target.id === 'cursorStart') {
-                startMonitoring();
-            }
-        });
-
-        function startMonitoring() {
-            document.addEventListener('keyup', handleCursorMovement);
-        }
-
-        function handleCursorMovement(event) {
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                const container = range.commonAncestorContainer;
-
-                let paragraph = container;
-                while (paragraph && paragraph.nodeName !== 'P') {
-                    paragraph = paragraph.parentNode;
-                }
-
-                if (paragraph && paragraph.textContent.toLowerCase().includes('professor')) {
-                    cutParagraph(paragraph);
-                    document.getElementById('output').focus();
-                }
-            }
         }
 
         function cutParagraph(paragraph) {
@@ -230,6 +179,7 @@
             selection.removeAllRanges();
             selection.addRange(range);
 
+            // Copy the text with formatting
             const tempDiv = document.createElement('div');
             tempDiv.appendChild(range.cloneContents());
             const textToCopy = tempDiv.innerHTML;
@@ -246,20 +196,62 @@
             document.body.removeChild(tempTextarea);
             document.body.removeChild(tempDiv);
 
+            // Remove the paragraph and cleanup
             paragraph.remove();
             cleanupSpaces();
+
+            // Update the count
             updateCounts();
         }
 
         function cleanupSpaces() {
             const outputContainer = document.getElementById('output');
-            const paragraphs = outputContainer.querySelectorAll('p');
+            const paragraphs = outputContainer.querySelectorAll('p, div');
             paragraphs.forEach(paragraph => {
                 if (!paragraph.innerText.trim()) {
                     paragraph.remove();
                 }
             });
         }
+
+        function handleCursorMovement(event) {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const container = range.commonAncestorContainer;
+
+                // Check if the cursor is inside a paragraph containing "Professor"
+                let paragraph = container;
+                while (paragraph && paragraph.nodeName !== 'P') {
+                    paragraph = paragraph.parentNode;
+                }
+
+                if (paragraph && paragraph.textContent.includes('Professor')) {
+                    cutParagraph(paragraph);
+
+                    // Set focus back to the text container after cutting
+                    document.getElementById('output').focus();
+                }
+            }
+        }
+
+        function startMonitoring() {
+            document.addEventListener('keyup', handleCursorMovement);
+        }
+
+        function updateFont() {
+            const fontStyle = document.getElementById('fontStyle').value;
+            const fontSize = document.getElementById('fontSize').value;
+            document.getElementById('output').style.fontFamily = fontStyle;
+            document.getElementById('output').style.fontSize = `${fontSize}px`;
+        }
+
+        document.getElementById('output').addEventListener('click', function(event) {
+            if (event.target.id === 'cursorStart') {
+                // Start monitoring cursor after clicking in the text container
+                startMonitoring();
+            }
+        });
     </script>
 </body>
 </html>
