@@ -34,6 +34,7 @@
         #countryCount {
             margin-left: 20px;
             font-size: 16px;
+            font-weight: bold;
         }
         .font-controls {
             margin-bottom: 10px;
@@ -93,9 +94,9 @@
         <textarea id="inputText" rows="10" cols="50" placeholder="Paste your text here..."></textarea>
         <button id="okButton" onclick="processText()">OK</button>
         <div id="adCount">Total Advertisements: 0</div>
+        <div id="countryCount">Country Counts:</div>
     </div>
     <div id="output" class="text-container" contenteditable="true"></div>
-    <div id="countryCount"></div>
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
     </div>
@@ -129,23 +130,35 @@
             return (text.match(regex) || []).length;
         }
 
+        function countCountryOccurrences(text) {
+            const lines = text.split('\n');
+            const countryCounts = {};
+
+            for (let i = 0; i < lines.length - 1; i++) {
+                const line = lines[i].trim();
+                const nextLine = lines[i + 1].trim();
+
+                if (nextLine.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)) { // Check if next line is an email
+                    countryList.forEach(country => {
+                        if (line.includes(country)) {
+                            countryCounts[country] = (countryCounts[country] || 0) + 1;
+                        }
+                    });
+                }
+            }
+            return countryCounts;
+        }
+
         function updateCounts() {
             const outputContainer = document.getElementById('output');
             const text = outputContainer.innerText;
             const adCount = countOccurrences(text, 'professor');
             document.getElementById('adCount').innerText = `Total Advertisements: ${adCount}`;
 
-            const countryCounts = {};
-            countryList.forEach(country => {
-                const count = countOccurrences(text, country);
-                if (count > 0) {
-                    countryCounts[country] = count;
-                }
-            });
-
-            let countryCountText = '';
+            const countryCounts = countCountryOccurrences(text);
+            let countryCountText = 'Country Counts:<br>';
             for (const country in countryCounts) {
-                countryCountText += `${country}: ${countryCounts[country]}; `;
+                countryCountText += `<b>${country}</b>: ${countryCounts[country]}; `;
             }
             document.getElementById('countryCount').innerHTML = countryCountText.trim();
         }
