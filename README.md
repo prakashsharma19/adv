@@ -32,7 +32,7 @@
             font-weight: bold;
         }
         #countryCount {
-            margin-left: 20px;
+            margin-top: 10px;
             font-size: 16px;
         }
         .font-controls {
@@ -96,9 +96,9 @@
         <textarea id="inputText" rows="10" cols="50" placeholder="Paste your text here..."></textarea>
         <button id="okButton" onclick="processText()">OK</button>
         <div id="adCount">Total Advertisements: 0</div>
-        <div id="countryCount"></div>
     </div>
     <div id="output" class="text-container" contenteditable="true"></div>
+    <div id="countryCount"></div>
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
     </div>
