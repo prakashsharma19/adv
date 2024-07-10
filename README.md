@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Selector and Copier</title>
+    <title>Advertisements</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,6 +12,8 @@
         }
         .input-container {
             margin-bottom: 20px;
+            display: flex;
+            align-items: center;
         }
         .text-container {
             margin: 20px 0;
@@ -24,61 +26,47 @@
         .text-container p {
             margin: 10px 0;
         }
-        #entryCount, #countryCount {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        #adCount {
+            margin-left: 20px;
             font-size: 18px;
             font-weight: bold;
         }
-        #countryCount {
-            top: 50px;
+        .font-controls {
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Text Selector and Copier</h1>
+    <h1>Advertisements</h1>
+    <div class="font-controls">
+        <label for="fontStyle">Font Style:</label>
+        <select id="fontStyle" onchange="updateFont()">
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Georgia">Georgia</option>
+        </select>
+        <label for="fontSize">Font Size:</label>
+        <input type="number" id="fontSize" value="16" onchange="updateFont()">px
+    </div>
     <div class="input-container">
-        <textarea id="inputText" rows="10" cols="50" placeholder="Paste your text here..."></textarea><br>
+        <textarea id="inputText" rows="10" cols="50" placeholder="Paste your text here..."></textarea>
         <button onclick="processText()">OK</button>
+        <div id="adCount">Total Advertisements: 0</div>
     </div>
     <div id="output" class="text-container" contenteditable="true"></div>
-    <div id="entryCount">Total Entries: 0</div>
-    <div id="countryCount">Country Counts:</div>
 
     <script>
-        const countries = ["USA", "Canada", "UK", "India", "Korea", "Germany", "France", "China", "Japan", "Australia"];
-        
         function countOccurrences(text, word) {
             const regex = new RegExp(`\\b${word}\\b`, 'gi');
             return (text.match(regex) || []).length;
         }
 
-        function countCountries(text) {
-            const countryCounts = {};
-            countries.forEach(country => {
-                const regex = new RegExp(`\\b${country}\\b`, 'gi');
-                const count = (text.match(regex) || []).length;
-                if (count > 0) {
-                    countryCounts[country] = count;
-                }
-            });
-            return countryCounts;
-        }
-
         function updateCount() {
             const outputContainer = document.getElementById('output');
             const text = outputContainer.innerText;
-
-            const professorCount = countOccurrences(text, 'professor');
-            document.getElementById('entryCount').innerText = `Total Entries: ${professorCount}`;
-
-            const countryCounts = countCountries(text);
-            let countryCountText = "Country Counts:<br>";
-            for (const [country, count] of Object.entries(countryCounts)) {
-                countryCountText += `${country}: ${count}<br>`;
-            }
-            document.getElementById('countryCount').innerHTML = countryCountText;
+            const adCount = countOccurrences(text, 'professor');
+            document.getElementById('adCount').innerText = `Total Advertisements: ${adCount}`;
         }
 
         function processText() {
@@ -168,6 +156,13 @@
 
         function startMonitoring() {
             document.addEventListener('keyup', handleCursorMovement);
+        }
+
+        function updateFont() {
+            const fontStyle = document.getElementById('fontStyle').value;
+            const fontSize = document.getElementById('fontSize').value;
+            document.getElementById('output').style.fontFamily = fontStyle;
+            document.getElementById('output').style.fontSize = `${fontSize}px`;
         }
 
         document.getElementById('output').addEventListener('click', function(event) {
