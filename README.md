@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advertisements-PPH</title>
+    <title>Text Selector and Copier</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,9 +23,30 @@
             background-color: #fff;
             cursor: text;
             white-space: pre-wrap; /* Maintain text format */
+            position: relative;
         }
         .text-container p {
             margin: 10px 0;
+        }
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px;
+            cursor: pointer;
+            transition-duration: 0.4s;
+        }
+        .copy-button:hover {
+            background-color: white;
+            color: black;
+            border: 2px solid #4CAF50;
         }
         #adCount {
             margin-top: 20px;
@@ -75,10 +96,14 @@
         #credits a:hover {
             text-decoration: underline;
         }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h1>Advertisements-PPH</h1>
+    <h1>Text Selector and Copier</h1>
     <div class="font-controls">
         <label for="fontStyle">Font Style:</label>
         <select id="fontStyle" onchange="updateFont()">
@@ -97,7 +122,9 @@
     </div>
     <div id="adCount">Total Advertisements: 0</div>
     <div id="countryCount">Country Counts:</div>
-    <div id="output" class="text-container" contenteditable="true"></div>
+    <div id="output" class="text-container" contenteditable="true">
+        <button class="copy-button" onclick="copyRemainingText()">Copy Remaining Text</button>
+    </div>
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
     </div>
@@ -107,7 +134,7 @@
             "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
             "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
             "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia",
-            "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "P. R. China", "PR China", "Colombia", "Comoros", "Congo", "Costa Rica",
+            "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica",
             "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt",
             "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon",
             "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
@@ -122,7 +149,7 @@
             "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea",
             "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
             "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
-            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "UK", "United States", "USA", "U.S.A.", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
+            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
             "Vietnam", "Yemen", "Zambia", "Zimbabwe"
         ];
 
@@ -150,6 +177,10 @@
             return countryCounts;
         }
 
+        function highlightErrors(text) {
+            return text.replace(/(\w+\?\w+)/g, '<span class="error">$1</span>');
+        }
+
         function updateCounts() {
             const outputContainer = document.getElementById('output');
             const text = outputContainer.innerText;
@@ -173,7 +204,7 @@
             paragraphs.forEach(paragraph => {
                 if (paragraph.trim() !== '') {
                     const p = document.createElement('p');
-                    p.innerHTML = paragraph.replace(/\n/g, '<br>');
+                    p.innerHTML = highlightErrors(paragraph.replace(/\n/g, '<br>'));
                     outputContainer.appendChild(p);
 
                     // Add a gap after each paragraph for smooth cursor movement
@@ -258,6 +289,19 @@
             const fontSize = document.getElementById('fontSize').value;
             document.getElementById('output').style.fontFamily = fontStyle;
             document.getElementById('output').style.fontSize = `${fontSize}px`;
+        }
+
+        function copyRemainingText() {
+            const outputContainer = document.getElementById('output');
+            const remainingText = outputContainer.innerText;
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.style.position = 'fixed';
+            tempTextarea.style.opacity = '0';
+            tempTextarea.value = remainingText;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
         }
 
         document.getElementById('output').addEventListener('click', function(event) {
