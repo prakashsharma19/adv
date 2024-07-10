@@ -34,6 +34,41 @@
         .font-controls {
             margin-bottom: 10px;
         }
+        #okButton {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            transition-duration: 0.4s;
+        }
+        #okButton:hover {
+            background-color: white;
+            color: black;
+            border: 2px solid #4CAF50;
+        }
+        #cursorStart {
+            font-weight: bold;
+            color: red;
+        }
+        #credits {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 16px;
+        }
+        #credits a {
+            color: #0000EE;
+            text-decoration: none;
+        }
+        #credits a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -45,16 +80,20 @@
             <option value="Times New Roman">Times New Roman</option>
             <option value="Courier New">Courier New</option>
             <option value="Georgia">Georgia</option>
+            <option value="Calibri Light">Calibri Light</option>
         </select>
         <label for="fontSize">Font Size:</label>
         <input type="number" id="fontSize" value="16" onchange="updateFont()">px
     </div>
     <div class="input-container">
         <textarea id="inputText" rows="10" cols="50" placeholder="Paste your text here..."></textarea>
-        <button onclick="processText()">OK</button>
+        <button id="okButton" onclick="processText()">OK</button>
         <div id="adCount">Total Advertisements: 0</div>
     </div>
     <div id="output" class="text-container" contenteditable="true"></div>
+    <div id="credits">
+        This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
+    </div>
 
     <script>
         function countOccurrences(text, word) {
@@ -167,8 +206,8 @@
 
         document.getElementById('output').addEventListener('click', function(event) {
             if (event.target.id === 'cursorStart') {
-                document.getElementById('cursorStart').innerHTML = ''; // Remove the placeholder text
-                startMonitoring(); // Start monitoring cursor after clicking in the text container
+                // Start monitoring cursor after clicking in the text container
+                startMonitoring();
             }
         });
     </script>
