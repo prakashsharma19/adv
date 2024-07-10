@@ -97,7 +97,9 @@
         <button id="okButton" onclick="processText()">OK</button>
         <div id="adCount">Total Advertisements: 0</div>
     </div>
-    <div id="output" class="text-container" contenteditable="true"></div>
+    <div id="output" class="text-container" contenteditable="true">
+        <p id="cursorStart"><b>Place your cursor here</b></p>
+    </div>
     <div id="countryCount"></div>
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
@@ -161,7 +163,7 @@
             for (const country in countryCounts) {
                 countryCountText += `<span class="country-name">${country}:</span> ${countryCounts[country]}; `;
             }
-            document.getElementById('countryCount').innerHTML = countryCountText.trim();
+            document.getElementById('countryCount').innerHTML = countryCountText;
         }
 
         function processText() {
@@ -177,6 +179,13 @@
             });
 
             updateCounts();
+            document.getElementById('output').focus();
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.setStart(paragraph.childNodes[0], 0);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
         }
 
         function updateFont() {
@@ -207,7 +216,7 @@
                     paragraph = paragraph.parentNode;
                 }
 
-                if (paragraph && paragraph.textContent.includes('professor')) {
+                if (paragraph && paragraph.textContent.toLowerCase().includes('professor')) {
                     cutParagraph(paragraph);
                     document.getElementById('output').focus();
                 }
