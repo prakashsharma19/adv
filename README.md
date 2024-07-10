@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Selector and Copier</title>
+    <title>Advertisements-PPH</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,6 +14,7 @@
             margin-bottom: 20px;
             display: flex;
             align-items: center;
+            flex-direction: column;
         }
         .text-container {
             margin: 20px 0;
@@ -27,12 +28,12 @@
             margin: 10px 0;
         }
         #adCount {
-            margin-left: 20px;
+            margin-top: 20px;
             font-size: 18px;
             font-weight: bold;
         }
         #countryCount {
-            margin-left: 20px;
+            margin-top: 10px;
             font-size: 16px;
             font-weight: bold;
         }
@@ -77,7 +78,7 @@
     </style>
 </head>
 <body>
-    <h1>Text Selector and Copier</h1>
+    <h1>Advertisements-PPH</h1>
     <div class="font-controls">
         <label for="fontStyle">Font Style:</label>
         <select id="fontStyle" onchange="updateFont()">
@@ -93,9 +94,9 @@
     <div class="input-container">
         <textarea id="inputText" rows="10" cols="50" placeholder="Paste your text here..."></textarea>
         <button id="okButton" onclick="processText()">OK</button>
-        <div id="adCount">Total Advertisements: 0</div>
-        <div id="countryCount">Country Counts:</div>
     </div>
+    <div id="adCount">Total Advertisements: 0</div>
+    <div id="countryCount">Country Counts:</div>
     <div id="output" class="text-container" contenteditable="true"></div>
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
@@ -106,7 +107,7 @@
             "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
             "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
             "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia",
-            "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica",
+            "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "P. R. China", "PR China", "Colombia", "Comoros", "Congo", "Costa Rica",
             "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt",
             "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon",
             "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
@@ -121,7 +122,7 @@
             "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea",
             "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
             "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
-            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
+            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "UK", "United States", "USA", "U.S.A.", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
             "Vietnam", "Yemen", "Zambia", "Zimbabwe"
         ];
 
