@@ -28,7 +28,7 @@
         .text-container p {
             margin: 10px 0;
         }
-        .copy-button {
+        .copy-button, .clear-button {
             background-color: #4CAF50; /* Green */
             border: none;
             color: white;
@@ -39,11 +39,18 @@
             font-size: 16px;
             cursor: pointer;
             transition-duration: 0.4s;
+            margin: 5px;
         }
-        .copy-button:hover {
+        .copy-button:hover, .clear-button:hover {
             background-color: white;
             color: black;
             border: 2px solid #4CAF50;
+        }
+        .clear-button {
+            background-color: #f44336; /* Red */
+        }
+        .clear-button:hover {
+            border: 2px solid #f44336;
         }
         #adCount {
             margin-top: 20px;
@@ -154,6 +161,7 @@
     <div id="adCount" style="display:none;">Total Advertisements: 0</div>
     <div id="countryCount" style="display:none;">Country Counts:</div>
     <button class="copy-button" style="display:none;" onclick="copyRemainingText()">Copy Remaining Text</button>
+    <button class="clear-button" style="display:none;" onclick="clearAllText()">Clear All</button>
     <div id="output" class="text-container" style="display:none;" contenteditable="true"></div>
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
@@ -285,13 +293,13 @@
             // Copy the text with formatting
             const tempDiv = document.createElement('div');
             tempDiv.appendChild(range.cloneContents());
-            const textToCopy = tempDiv.innerHTML;
+            const textToCopy = tempDiv.innerText;
             document.body.appendChild(tempDiv);
 
             const tempTextarea = document.createElement('textarea');
             tempTextarea.style.position = 'fixed';
             tempTextarea.style.opacity = '0';
-            tempTextarea.value = paragraph.innerText; // Changed to innerText to avoid copying HTML tags
+            tempTextarea.value = textToCopy; // Changed to innerText to avoid copying HTML tags
 
             document.body.appendChild(tempTextarea);
             tempTextarea.select();
@@ -303,8 +311,14 @@
             paragraph.remove();
             cleanupSpaces();
 
-            // Update the count
+            // Update the input textarea
+            const inputText = document.getElementById('inputText').value;
+            const updatedText = inputText.replace(new RegExp(`(?:\\n)?${textToCopy}(?:\\n)?`), '');
+            document.getElementById('inputText').value = updatedText;
+
+            // Update the count and save changes
             updateCounts();
+            saveText();
         }
 
         function cleanupSpaces() {
@@ -362,6 +376,17 @@
             document.body.removeChild(tempTextarea);
         }
 
+        function clearAllText() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('output').innerHTML = '';
+            document.getElementById('adCount').innerText = 'Total Advertisements: 0';
+            document.getElementById('countryCount').innerText = 'Country Counts:';
+            if (currentUser) {
+                localStorage.removeItem(`savedInput_${currentUser}`);
+                localStorage.removeItem(`savedOutput_${currentUser}`);
+            }
+        }
+
         function login() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
@@ -374,6 +399,7 @@
                 document.getElementById('adCount').style.display = 'block';
                 document.getElementById('countryCount').style.display = 'block';
                 document.querySelector('.copy-button').style.display = 'block';
+                document.querySelector('.clear-button').style.display = 'block';
                 document.getElementById('output').style.display = 'block';
                 loadText();
             } else {
