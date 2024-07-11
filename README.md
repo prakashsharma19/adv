@@ -97,11 +97,45 @@
             color: red;
             font-weight: bold;
         }
+        .login-container {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .login-container input {
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #loginButton {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition-duration: 0.4s;
+        }
+        #loginButton:hover {
+            background-color: white;
+            color: black;
+            border: 2px solid #4CAF50;
+        }
     </style>
 </head>
 <body>
     <h1>Text Selector and Copier</h1>
-    <div class="font-controls">
+    <div class="login-container">
+        <input type="text" id="username" placeholder="Enter your name">
+        <input type="password" id="password" placeholder="Enter your password">
+        <button id="loginButton" onclick="login()">Login</button>
+    </div>
+    <div class="font-controls" style="display:none;">
         <label for="fontStyle">Font Style:</label>
         <select id="fontStyle" onchange="updateFont()">
             <option value="Arial">Arial</option>
@@ -113,14 +147,14 @@
         <label for="fontSize">Font Size:</label>
         <input type="number" id="fontSize" value="16" onchange="updateFont()">px
     </div>
-    <div class="input-container">
+    <div class="input-container" style="display:none;">
         <textarea id="inputText" rows="10" cols="50" placeholder="Paste your text here..."></textarea>
         <button id="okButton" onclick="processText()">OK</button>
     </div>
-    <div id="adCount">Total Advertisements: 0</div>
-    <div id="countryCount">Country Counts:</div>
-    <button class="copy-button" onclick="copyRemainingText()">Copy Remaining Text</button>
-    <div id="output" class="text-container" contenteditable="true"></div>
+    <div id="adCount" style="display:none;">Total Advertisements: 0</div>
+    <div id="countryCount" style="display:none;">Country Counts:</div>
+    <button class="copy-button" style="display:none;" onclick="copyRemainingText()">Copy Remaining Text</button>
+    <div id="output" class="text-container" style="display:none;" contenteditable="true"></div>
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
     </div>
@@ -149,17 +183,23 @@
             "Vietnam", "Yemen", "Zambia", "Zimbabwe"
         ];
 
-        // Function to save text to localStorage
+        let currentUser = null;
+
+        // Function to save text to localStorage for the current user
         function saveText() {
             const inputText = document.getElementById('inputText').value;
-            localStorage.setItem('savedText', inputText);
+            if (currentUser) {
+                localStorage.setItem(`savedText_${currentUser}`, inputText);
+            }
         }
 
-        // Function to load text from localStorage
+        // Function to load text from localStorage for the current user
         function loadText() {
-            const savedText = localStorage.getItem('savedText');
-            if (savedText) {
-                document.getElementById('inputText').value = savedText;
+            if (currentUser) {
+                const savedText = localStorage.getItem(`savedText_${currentUser}`);
+                if (savedText) {
+                    document.getElementById('inputText').value = savedText;
+                }
             }
         }
 
@@ -225,7 +265,7 @@
             });
 
             updateCounts();
-            saveText(); // Save text to localStorage
+            saveText(); // Save text to localStorage for the current user
         }
 
         function cutParagraph(paragraph) {
@@ -315,15 +355,26 @@
             document.body.removeChild(tempTextarea);
         }
 
-        document.getElementById('output').addEventListener('click', function(event) {
-            if (event.target.id === 'cursorStart') {
-                // Start monitoring cursor after clicking in the text container
-                startMonitoring();
-            }
-        });
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-        // Load saved text from localStorage on page load
-        window.onload = loadText;
+            if (username && password) {
+                currentUser = `${username}_${password}`;
+                document.querySelector('.login-container').style.display = 'none';
+                document.querySelector('.font-controls').style.display = 'block';
+                document.querySelector('.input-container').style.display = 'block';
+                document.getElementById('adCount').style.display = 'block';
+                document.getElementById('countryCount').style.display = 'block';
+                document.querySelector('.copy-button').style.display = 'block';
+                document.getElementById('output').style.display = 'block';
+                loadText();
+            } else {
+                alert('Please enter both username and password.');
+            }
+        }
+
+        // No need to loadText on page load since it will be handled on login
     </script>
 </body>
 </html>
