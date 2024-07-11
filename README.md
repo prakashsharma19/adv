@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advertisements-PPH</title>
+    <title>Text Selector and Copier</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -100,7 +100,7 @@
     </style>
 </head>
 <body>
-    <h1>Advertisements-PPH</h1>
+    <h1>Text Selector and Copier</h1>
     <div class="font-controls">
         <label for="fontStyle">Font Style:</label>
         <select id="fontStyle" onchange="updateFont()">
@@ -145,9 +145,23 @@
             "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea",
             "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
             "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
-            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "UK", "United States", "USA", "U.S.A.", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
+            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
             "Vietnam", "Yemen", "Zambia", "Zimbabwe"
         ];
+
+        // Function to save text to localStorage
+        function saveText() {
+            const inputText = document.getElementById('inputText').value;
+            localStorage.setItem('savedText', inputText);
+        }
+
+        // Function to load text from localStorage
+        function loadText() {
+            const savedText = localStorage.getItem('savedText');
+            if (savedText) {
+                document.getElementById('inputText').value = savedText;
+            }
+        }
 
         function countOccurrences(text, word) {
             const regex = new RegExp(`\\b${word}\\b`, 'gi');
@@ -211,6 +225,7 @@
             });
 
             updateCounts();
+            saveText(); // Save text to localStorage
         }
 
         function cutParagraph(paragraph) {
@@ -306,6 +321,9 @@
                 startMonitoring();
             }
         });
+
+        // Load saved text from localStorage on page load
+        window.onload = loadText;
     </script>
 </body>
 </html>
