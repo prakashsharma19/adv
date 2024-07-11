@@ -29,17 +29,14 @@
             margin: 10px 0;
         }
         .copy-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
             background-color: #4CAF50; /* Green */
             border: none;
             color: white;
-            padding: 5px 10px;
+            padding: 10px 20px;
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            font-size: 12px;
+            font-size: 16px;
             cursor: pointer;
             transition-duration: 0.4s;
         }
@@ -122,8 +119,8 @@
     </div>
     <div id="adCount">Total Advertisements: 0</div>
     <div id="countryCount">Country Counts:</div>
-    <div id="output" class="text-container" contenteditable="true"></div>
     <button class="copy-button" onclick="copyRemainingText()">Copy Remaining Text</button>
+    <div id="output" class="text-container" contenteditable="true"></div>
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
     </div>
@@ -232,7 +229,7 @@
             const tempTextarea = document.createElement('textarea');
             tempTextarea.style.position = 'fixed';
             tempTextarea.style.opacity = '0';
-            tempTextarea.value = paragraph.innerHTML.replace(/<br>/g, '\n');
+            tempTextarea.value = paragraph.innerText; // Changed to innerText to avoid copying HTML tags
 
             document.body.appendChild(tempTextarea);
             tempTextarea.select();
