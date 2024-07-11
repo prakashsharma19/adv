@@ -284,28 +284,22 @@
         }
 
         function cutParagraph(paragraph) {
+            const textToCopy = paragraph.innerText;
             const selection = window.getSelection();
             const range = document.createRange();
             range.selectNodeContents(paragraph);
             selection.removeAllRanges();
             selection.addRange(range);
 
-            // Copy the text with formatting
-            const tempDiv = document.createElement('div');
-            tempDiv.appendChild(range.cloneContents());
-            const textToCopy = tempDiv.innerText;
-            document.body.appendChild(tempDiv);
-
+            // Copy the text without formatting
             const tempTextarea = document.createElement('textarea');
             tempTextarea.style.position = 'fixed';
             tempTextarea.style.opacity = '0';
-            tempTextarea.value = textToCopy; // Changed to innerText to avoid copying HTML tags
-
+            tempTextarea.value = textToCopy;
             document.body.appendChild(tempTextarea);
             tempTextarea.select();
             document.execCommand('copy');
             document.body.removeChild(tempTextarea);
-            document.body.removeChild(tempDiv);
 
             // Remove the paragraph and cleanup
             paragraph.remove();
@@ -407,7 +401,12 @@
             }
         }
 
-        // No need to loadText on page load since it will be handled on login
+        document.getElementById('output').addEventListener('click', function(event) {
+            if (event.target.id === 'cursorStart') {
+                // Start monitoring cursor after clicking in the text container
+                startMonitoring();
+            }
+        });
     </script>
 </body>
 </html>
