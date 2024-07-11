@@ -122,9 +122,8 @@
     </div>
     <div id="adCount">Total Advertisements: 0</div>
     <div id="countryCount">Country Counts:</div>
-    <div id="output" class="text-container" contenteditable="true">
-        <button class="copy-button" onclick="copyRemainingText()">Copy Remaining Text</button>
-    </div>
+    <div id="output" class="text-container" contenteditable="true"></div>
+    <button class="copy-button" onclick="copyRemainingText()">Copy Remaining Text</button>
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
     </div>
