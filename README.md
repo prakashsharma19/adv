@@ -188,18 +188,25 @@
         // Function to save text to localStorage for the current user
         function saveText() {
             const inputText = document.getElementById('inputText').value;
+            const outputText = document.getElementById('output').innerHTML;
             if (currentUser) {
-                localStorage.setItem(`savedText_${currentUser}`, inputText);
+                localStorage.setItem(`savedInput_${currentUser}`, inputText);
+                localStorage.setItem(`savedOutput_${currentUser}`, outputText);
             }
         }
 
         // Function to load text from localStorage for the current user
         function loadText() {
             if (currentUser) {
-                const savedText = localStorage.getItem(`savedText_${currentUser}`);
-                if (savedText) {
-                    document.getElementById('inputText').value = savedText;
+                const savedInput = localStorage.getItem(`savedInput_${currentUser}`);
+                const savedOutput = localStorage.getItem(`savedOutput_${currentUser}`);
+                if (savedInput) {
+                    document.getElementById('inputText').value = savedInput;
                 }
+                if (savedOutput) {
+                    document.getElementById('output').innerHTML = savedOutput;
+                }
+                updateCounts();
             }
         }
 
