@@ -57,6 +57,16 @@
             font-size: 18px;
             font-weight: bold;
         }
+        #dailyAdCount {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #remainingTime {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
         #countryCount {
             margin-top: 10px;
             font-size: 16px;
@@ -133,6 +143,20 @@
             color: black;
             border: 2px solid #4CAF50;
         }
+        @keyframes hourglass {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .hourglass {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #000;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: hourglass 1s linear infinite;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -159,6 +183,8 @@
         <button id="okButton" onclick="processText()">OK</button>
     </div>
     <div id="adCount" style="display:none;">Total Advertisements: 0</div>
+    <div id="dailyAdCount" style="display:none;">Total Ads Today: 0</div>
+    <div id="remainingTime" style="display:none;">Remaining Time: <span id="time"></span><div class="hourglass"></div></div>
     <div id="countryCount" style="display:none;">Country Counts:</div>
     <button class="copy-button" style="display:none;" onclick="copyRemainingText()">Copy Remaining Text</button>
     <button class="clear-button" style="display:none;" onclick="clearAllText()">Clear All</button>
@@ -192,6 +218,9 @@
         ];
 
         let currentUser = null;
+        let dailyAdCount = 0;
+        let startTime = Date.now();
+        let cutCount = 0;
 
         // Function to save text to localStorage for the current user
         function saveText() {
@@ -200,6 +229,8 @@
             if (currentUser) {
                 localStorage.setItem(`savedInput_${currentUser}`, inputText);
                 localStorage.setItem(`savedOutput_${currentUser}`, outputText);
+                localStorage.setItem(`dailyAdCount_${currentUser}`, dailyAdCount);
+                localStorage.setItem(`lastCutTime_${currentUser}`, Date.now());
             }
         }
 
@@ -208,11 +239,15 @@
             if (currentUser) {
                 const savedInput = localStorage.getItem(`savedInput_${currentUser}`);
                 const savedOutput = localStorage.getItem(`savedOutput_${currentUser}`);
+                const savedDailyAdCount = localStorage.getItem(`dailyAdCount_${currentUser}`);
                 if (savedInput) {
                     document.getElementById('inputText').value = savedInput;
                 }
                 if (savedOutput) {
                     document.getElementById('output').innerHTML = savedOutput;
+                }
+                if (savedDailyAdCount) {
+                    dailyAdCount = parseInt(savedDailyAdCount, 10);
                 }
                 updateCounts();
             }
@@ -251,6 +286,7 @@
             const text = outputContainer.innerText;
             const adCount = countOccurrences(text, 'professor');
             document.getElementById('adCount').innerText = `Total Advertisements: ${adCount}`;
+            document.getElementById('dailyAdCount').innerText = `Total Ads Today: ${dailyAdCount}`;
 
             const countryCounts = countCountryOccurrences(text);
             let countryCountText = 'Country Counts:<br>';
@@ -258,6 +294,22 @@
                 countryCountText += `<b>${country}</b>: ${countryCounts[country]}; `;
             }
             document.getElementById('countryCount').innerHTML = countryCountText.trim();
+
+            updateRemainingTime(adCount);
+        }
+
+        function updateRemainingTime(adCount) {
+            const currentTime = Date.now();
+            const elapsedTime = (currentTime - startTime) / 1000; // in seconds
+            const averageTimePerCut = elapsedTime / cutCount;
+            const remainingAds = adCount - dailyAdCount;
+            const remainingTimeInSeconds = remainingAds * averageTimePerCut;
+
+            const hours = Math.floor(remainingTimeInSeconds / 3600);
+            const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
+            const seconds = Math.floor(remainingTimeInSeconds % 60);
+
+            document.getElementById('time').innerText = `${hours}h ${minutes}m ${seconds}s`;
         }
 
         function processText() {
@@ -309,6 +361,10 @@
             const inputText = document.getElementById('inputText').value;
             const updatedText = inputText.replace(new RegExp(`(?:\\n)?${textToCopy}(?:\\n)?`), '');
             document.getElementById('inputText').value = updatedText;
+
+            // Update the daily ad count
+            dailyAdCount++;
+            cutCount++;
 
             // Update the count and save changes
             updateCounts();
@@ -374,11 +430,15 @@
             document.getElementById('inputText').value = '';
             document.getElementById('output').innerHTML = '';
             document.getElementById('adCount').innerText = 'Total Advertisements: 0';
+            document.getElementById('dailyAdCount').innerText = 'Total Ads Today: 0';
             document.getElementById('countryCount').innerText = 'Country Counts:';
             if (currentUser) {
                 localStorage.removeItem(`savedInput_${currentUser}`);
                 localStorage.removeItem(`savedOutput_${currentUser}`);
+                localStorage.removeItem(`dailyAdCount_${currentUser}`);
             }
+            dailyAdCount = 0;
+            cutCount = 0;
         }
 
         function login() {
@@ -391,6 +451,8 @@
                 document.querySelector('.font-controls').style.display = 'block';
                 document.querySelector('.input-container').style.display = 'block';
                 document.getElementById('adCount').style.display = 'block';
+                document.getElementById('dailyAdCount').style.display = 'block';
+                document.getElementById('remainingTime').style.display = 'block';
                 document.getElementById('countryCount').style.display = 'block';
                 document.querySelector('.copy-button').style.display = 'block';
                 document.querySelector('.clear-button').style.display = 'block';
@@ -407,6 +469,23 @@
                 startMonitoring();
             }
         });
+
+        // Check for daily reset of ad count
+        function checkDailyReset() {
+            const lastCutTime = localStorage.getItem(`lastCutTime_${currentUser}`);
+            if (lastCutTime) {
+                const lastCutDate = new Date(parseInt(lastCutTime, 10));
+                const currentDate = new Date();
+                if (lastCutDate.toDateString() !== currentDate.toDateString()) {
+                    dailyAdCount = 0;
+                    localStorage.setItem(`dailyAdCount_${currentUser}`, dailyAdCount);
+                }
+            }
+        }
+
+        setInterval(checkDailyReset, 60000); // Check every minute
+
+        // No need to loadText on page load since it will be handled on login
     </script>
 </body>
 </html>
