@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advertisements-PPH</title>
+    <title>Text Selector and Copier</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,7 +28,7 @@
         .text-container p {
             margin: 10px 0;
         }
-        .copy-button, .clear-button {
+        .copy-button {
             background-color: #4CAF50; /* Green */
             border: none;
             color: white;
@@ -41,26 +41,26 @@
             transition-duration: 0.4s;
             margin: 5px;
         }
-        .copy-button:hover, .clear-button:hover {
+        .copy-button:hover {
             background-color: white;
             color: black;
             border: 2px solid #4CAF50;
-        }
-        .clear-button {
-            background-color: #f44336; /* Red */
-        }
-        .clear-button:hover {
-            border: 2px solid #f44336;
         }
         #adCount, #dailyAdCount, #remainingTime, #countryCount {
             margin-top: 10px;
             font-size: 18px;
             font-weight: bold;
         }
-        #remainingTime {
+        #countryCount {
             position: absolute;
-            right: 20px;
-            top: 20px;
+            left: 20px;
+            top: 150px;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+        #remainingTime {
+            margin-top: 10px;
         }
         .font-controls {
             margin-bottom: 10px;
@@ -89,7 +89,7 @@
         }
         #credits {
             position: absolute;
-            bottom: 20px;
+            top: 20px;
             right: 20px;
             font-size: 16px;
         }
@@ -144,7 +144,7 @@
     </style>
 </head>
 <body>
-    <h1>Advertisements-PPH</h1>
+    <h1>Text Selector and Copier</h1>
     <div class="login-container">
         <input type="text" id="username" placeholder="Enter your name">
         <input type="password" id="password" placeholder="Enter your password">
@@ -169,9 +169,8 @@
     <div id="adCount" style="display:none;">Total Advertisements: 0</div>
     <div id="dailyAdCount" style="display:none;">Total Ads Today: 0</div>
     <div id="remainingTime" style="display:none;">Remaining Time: <span id="time"></span><div class="hourglass"></div></div>
-    <div id="countryCount" style="display:none;">Country Counts:</div>
+    <div id="countryCount" style="display:none;"></div>
     <button class="copy-button" style="display:none;" onclick="copyRemainingText()">Copy Remaining Text</button>
-    <button class="clear-button" style="display:none;" onclick="clearAllText()">Clear All</button>
     <div id="output" class="text-container" style="display:none;" contenteditable="true"></div>
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
@@ -194,10 +193,10 @@
             "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau",
             "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania",
             "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal",
-            "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "Korea",
+            "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea",
             "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
             "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
-            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "UK", "United States", "USA", "U.S.A.", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
+            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
             "Vietnam", "Yemen", "Zambia", "Zimbabwe"
         ];
 
@@ -274,10 +273,11 @@
             document.getElementById('dailyAdCount').innerText = `Total Ads Today: ${dailyAdCount}`;
 
             const countryCounts = countCountryOccurrences(text);
+            const sortedCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
             let countryCountText = 'Country Counts:<br>';
-            for (const country in countryCounts) {
-                countryCountText += `<b>${country}</b>: ${countryCounts[country]}; `;
-            }
+            sortedCountries.forEach(([country, count]) => {
+                countryCountText += `<b>${country}</b>: ${count}<br>`;
+            });
             document.getElementById('countryCount').innerHTML = countryCountText.trim();
 
             updateRemainingTime(adCount);
@@ -456,7 +456,6 @@
                 document.getElementById('remainingTime').style.display = 'block';
                 document.getElementById('countryCount').style.display = 'block';
                 document.querySelector('.copy-button').style.display = 'block';
-                document.querySelector('.clear-button').style.display = 'block';
                 document.getElementById('output').style.display = 'block';
                 loadText();
             } else {
