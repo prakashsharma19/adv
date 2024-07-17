@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Selector and Copier</title>
+    <title>Advertisements-PPH</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -144,7 +144,7 @@
     </style>
 </head>
 <body>
-    <h1>Text Selector and Copier</h1>
+    <h1>Advertisements-PPH</h1>
     <div class="login-container">
         <input type="text" id="username" placeholder="Enter your name">
         <input type="password" id="password" placeholder="Enter your password">
@@ -194,10 +194,10 @@
             "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau",
             "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania",
             "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal",
-            "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea",
+            "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "Korea",
             "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
             "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
-            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
+            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "UK", "United States", "USA", "U.S.A.", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
             "Vietnam", "Yemen", "Zambia", "Zimbabwe"
         ];
 
