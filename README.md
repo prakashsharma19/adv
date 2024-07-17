@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advertisement-PPH</title>
+    <title>Text Selector and Copier</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,25 +52,15 @@
         .clear-button:hover {
             border: 2px solid #f44336;
         }
-        #adCount {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        #dailyAdCount {
+        #adCount, #dailyAdCount, #remainingTime, #countryCount {
             margin-top: 10px;
             font-size: 18px;
             font-weight: bold;
         }
         #remainingTime {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        #countryCount {
-            margin-top: 10px;
-            font-size: 16px;
-            font-weight: bold;
+            position: absolute;
+            right: 20px;
+            top: 20px;
         }
         .font-controls {
             margin-bottom: 10px;
@@ -99,7 +89,7 @@
         }
         #credits {
             position: absolute;
-            top: 20px;
+            bottom: 20px;
             right: 20px;
             font-size: 16px;
         }
@@ -143,24 +133,18 @@
             color: black;
             border: 2px solid #4CAF50;
         }
-        @keyframes hourglass {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
         .hourglass {
-            display: inline-block;
             width: 24px;
             height: 24px;
-            border: 2px solid #000;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: hourglass 1s linear infinite;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/4/4e/Simpleicons_Interface_hourglass.svg');
+            background-size: cover;
+            display: inline-block;
             margin-left: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Advertisement-PPH</h1>
+    <h1>Text Selector and Copier</h1>
     <div class="login-container">
         <input type="text" id="username" placeholder="Enter your name">
         <input type="password" id="password" placeholder="Enter your password">
@@ -210,10 +194,10 @@
             "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau",
             "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania",
             "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal",
-            "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "Korea",
+            "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea",
             "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
             "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
-            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "UK", "United States", "USA", "U.S.A.", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
+            "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
             "Vietnam", "Yemen", "Zambia", "Zimbabwe"
         ];
 
@@ -221,6 +205,7 @@
         let dailyAdCount = 0;
         let startTime = Date.now();
         let cutCount = 0;
+        let adTimestamps = [];
 
         // Function to save text to localStorage for the current user
         function saveText() {
@@ -299,17 +284,19 @@
         }
 
         function updateRemainingTime(adCount) {
-            const currentTime = Date.now();
-            const elapsedTime = (currentTime - startTime) / 1000; // in seconds
+            if (cutCount === 0) return;
+
+            const now = Date.now();
+            const elapsedTime = (now - startTime) / 1000; // in seconds
             const averageTimePerCut = elapsedTime / cutCount;
+
             const remainingAds = adCount - dailyAdCount;
             const remainingTimeInSeconds = remainingAds * averageTimePerCut;
 
             const hours = Math.floor(remainingTimeInSeconds / 3600);
             const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
-            const seconds = Math.floor(remainingTimeInSeconds % 60);
 
-            document.getElementById('time').innerText = `${hours}h ${minutes}m ${seconds}s`;
+            document.getElementById('time').innerText = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
         }
 
         function processText() {
@@ -318,21 +305,31 @@
             const outputContainer = document.getElementById('output');
             outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
 
-            paragraphs.forEach(paragraph => {
-                if (paragraph.trim() !== '') {
-                    const p = document.createElement('p');
-                    p.innerHTML = highlightErrors(paragraph.replace(/\n/g, '<br>'));
-                    outputContainer.appendChild(p);
+            let index = 0;
+            function processChunk() {
+                const chunkSize = 100; // Number of paragraphs to process in one go
+                const end = Math.min(index + chunkSize, paragraphs.length);
+                for (; index < end; index++) {
+                    const paragraph = paragraphs[index];
+                    if (paragraph.trim() !== '') {
+                        const p = document.createElement('p');
+                        p.innerHTML = highlightErrors(paragraph.replace(/\n/g, '<br>'));
+                        outputContainer.appendChild(p);
 
-                    // Add a gap after each paragraph for smooth cursor movement
-                    const gap = document.createElement('div');
-                    gap.innerHTML = '<br><br>'; // Add larger gap
-                    outputContainer.appendChild(gap);
+                        // Add a gap after each paragraph for smooth cursor movement
+                        const gap = document.createElement('div');
+                        gap.innerHTML = '<br><br>'; // Add larger gap
+                        outputContainer.appendChild(gap);
+                    }
                 }
-            });
-
-            updateCounts();
-            saveText(); // Save text to localStorage for the current user
+                if (index < paragraphs.length) {
+                    requestAnimationFrame(processChunk);
+                } else {
+                    updateCounts();
+                    saveText(); // Save text to localStorage for the current user
+                }
+            }
+            requestAnimationFrame(processChunk);
         }
 
         function cutParagraph(paragraph) {
@@ -365,6 +362,9 @@
             // Update the daily ad count
             dailyAdCount++;
             cutCount++;
+
+            // Save the timestamp for the cut operation
+            adTimestamps.push(Date.now());
 
             // Update the count and save changes
             updateCounts();
@@ -439,6 +439,7 @@
             }
             dailyAdCount = 0;
             cutCount = 0;
+            adTimestamps = [];
         }
 
         function login() {
