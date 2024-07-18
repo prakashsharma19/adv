@@ -197,14 +197,12 @@
             "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
             "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
             "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
-            "Vietnam", "Yemen", "Zambia", "Zimbabwe", "USA", "U.S.A.", "UK", "Korea"
+            "Vietnam", "Yemen", "Zambia", "Zimbabwe", "UK", "USA", "U.S.A.", "Korea"
         ];
 
         let currentUser = null;
         let dailyAdCount = 0;
-        let startTime = Date.now();
-        let cutCount = 0;
-        let adTimestamps = [];
+        let totalTimeInSeconds = 0;
 
         // Function to save text to localStorage for the current user
         function saveText() {
@@ -224,14 +222,19 @@
                 const savedInput = localStorage.getItem(`savedInput_${currentUser}`);
                 const savedOutput = localStorage.getItem(`savedOutput_${currentUser}`);
                 const savedDailyAdCount = localStorage.getItem(`dailyAdCount_${currentUser}`);
+                const lastCutTime = localStorage.getItem(`lastCutTime_${currentUser}`);
                 if (savedInput) {
                     document.getElementById('inputText').value = savedInput;
                 }
                 if (savedOutput) {
                     document.getElementById('output').innerHTML = savedOutput;
                 }
-                if (savedDailyAdCount) {
-                    dailyAdCount = parseInt(savedDailyAdCount, 10);
+                if (savedDailyAdCount && lastCutTime) {
+                    const lastCutDate = new Date(parseInt(lastCutTime, 10));
+                    const currentDate = new Date();
+                    if (lastCutDate.toDateString() === currentDate.toDateString()) {
+                        dailyAdCount = parseInt(savedDailyAdCount, 10);
+                    }
                 }
                 updateCounts();
             }
@@ -280,19 +283,11 @@
             });
             document.getElementById('countryCount').innerHTML = countryCountText.trim();
 
-            updateRemainingTime(adCount);
+            updateRemainingTime();
         }
 
-        function updateRemainingTime(adCount) {
-            if (cutCount === 0) return;
-
-            const now = Date.now();
-            const elapsedTime = (now - startTime) / 1000; // in seconds
-            const averageTimePerCut = elapsedTime / cutCount;
-
-            const remainingAds = adCount - dailyAdCount;
-            const remainingTimeInSeconds = remainingAds * averageTimePerCut;
-
+        function updateRemainingTime() {
+            const remainingTimeInSeconds = totalTimeInSeconds - (dailyAdCount * 8);
             const hours = Math.floor(remainingTimeInSeconds / 3600);
             const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
 
@@ -304,6 +299,10 @@
             const paragraphs = inputText.split('\n\n');
             const outputContainer = document.getElementById('output');
             outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
+
+            // Calculate total time for all ads
+            const totalAds = countOccurrences(inputText, 'professor');
+            totalTimeInSeconds = totalAds * 8;
 
             let index = 0;
             function processChunk() {
@@ -361,10 +360,6 @@
 
             // Update the daily ad count
             dailyAdCount++;
-            cutCount++;
-
-            // Save the timestamp for the cut operation
-            adTimestamps.push(Date.now());
 
             // Update the count and save changes
             updateCounts();
@@ -426,22 +421,6 @@
             document.body.removeChild(tempTextarea);
         }
 
-        function clearAllText() {
-            document.getElementById('inputText').value = '';
-            document.getElementById('output').innerHTML = '';
-            document.getElementById('adCount').innerText = 'Total Advertisements: 0';
-            document.getElementById('dailyAdCount').innerText = 'Total Ads Today: 0';
-            document.getElementById('countryCount').innerText = 'Country Counts:';
-            if (currentUser) {
-                localStorage.removeItem(`savedInput_${currentUser}`);
-                localStorage.removeItem(`savedOutput_${currentUser}`);
-                localStorage.removeItem(`dailyAdCount_${currentUser}`);
-            }
-            dailyAdCount = 0;
-            cutCount = 0;
-            adTimestamps = [];
-        }
-
         function login() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
@@ -472,11 +451,11 @@
 
         // Check for daily reset of ad count
         function checkDailyReset() {
+            const now = new Date();
             const lastCutTime = localStorage.getItem(`lastCutTime_${currentUser}`);
             if (lastCutTime) {
                 const lastCutDate = new Date(parseInt(lastCutTime, 10));
-                const currentDate = new Date();
-                if (lastCutDate.toDateString() !== currentDate.toDateString()) {
+                if (lastCutDate.toDateString() !== now.toDateString()) {
                     dailyAdCount = 0;
                     localStorage.setItem(`dailyAdCount_${currentUser}`, dailyAdCount);
                 }
