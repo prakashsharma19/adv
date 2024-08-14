@@ -172,6 +172,19 @@
     <div id="countryCount" style="display:none;"></div>
     <button class="copy-button" style="display:none;" onclick="copyRemainingText()">Copy Remaining Text</button>
     <div id="output" class="text-container" style="display:none;" contenteditable="true"></div>
+
+    <!-- Option to choose cut method -->
+    <div style="margin-top: 20px;">
+        <label>
+            <input type="radio" name="cutOption" value="keyboard" checked>
+            Operate by Keyboard (Down Arrow)
+        </label>
+        <label>
+            <input type="radio" name="cutOption" value="mouse">
+            Operate by Mouse (Left Button)
+        </label>
+    </div>
+
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
     </div>
@@ -397,8 +410,20 @@
             }
         }
 
+        function handleMouseClick(event) {
+            const cutOption = document.querySelector('input[name="cutOption"]:checked').value;
+            if (cutOption === 'mouse') {
+                handleCursorMovement(event);
+            }
+        }
+
         function startMonitoring() {
-            document.addEventListener('keyup', handleCursorMovement);
+            const cutOption = document.querySelector('input[name="cutOption"]:checked').value;
+            if (cutOption === 'keyboard') {
+                document.addEventListener('keyup', handleCursorMovement);
+            } else {
+                document.removeEventListener('keyup', handleCursorMovement);
+            }
         }
 
         function updateFont() {
@@ -446,7 +471,13 @@
             if (event.target.id === 'cursorStart') {
                 // Start monitoring cursor after clicking in the text container
                 startMonitoring();
+            } else {
+                handleMouseClick(event);
             }
+        });
+
+        document.querySelectorAll('input[name="cutOption"]').forEach(option => {
+            option.addEventListener('change', startMonitoring);
         });
 
         // Check for daily reset of ad count
