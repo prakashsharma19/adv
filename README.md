@@ -28,7 +28,7 @@
         .text-container p {
             margin: 10px 0;
         }
-        .copy-button, .undo-button {
+        .copy-button {
             background-color: #4CAF50; /* Green */
             border: none;
             color: white;
@@ -41,7 +41,7 @@
             transition-duration: 0.4s;
             margin: 5px;
         }
-        .copy-button:hover, .undo-button:hover {
+        .copy-button:hover {
             background-color: white;
             color: black;
             border: 2px solid #4CAF50;
@@ -177,16 +177,13 @@
     <div style="margin-top: 20px;">
         <label>
             <input type="radio" name="cutOption" value="keyboard" checked>
-            Cut by Keyboard
+            Operate by Keyboard (Down Arrow Key)
         </label>
         <label>
             <input type="radio" name="cutOption" value="mouse">
-            Cut by Mouse
+            Operate by Mouse (Left Button)
         </label>
     </div>
-
-    <!-- Undo button -->
-    <button class="undo-button" style="display:none;" onclick="undoLastCut()">Undo Last Cut</button>
 
     <div id="credits">
         This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
@@ -213,13 +210,12 @@
             "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
             "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
             "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
-            "Vietnam", "Yemen", "Zambia", "Zimbabwe", "UK", "USA", "U.S.A.", "Korea"
+            "Vietnam", "Yemen", "Zambia", "Zimbabwe", "UK", "USA", "U.S.A.", "Korea", "UAE"
         ];
 
         let currentUser = null;
         let dailyAdCount = 0;
         let totalTimeInSeconds = 0;
-        let undoStack = []; // To track up to 10 cut entries
 
         // Function to save text to localStorage for the current user
         function saveText() {
@@ -350,13 +346,6 @@
 
         function cutParagraph(paragraph) {
             const textToCopy = paragraph.innerText;
-
-            // Add the cut entry to the undo stack
-            undoStack.push(textToCopy);
-            if (undoStack.length > 10) {
-                undoStack.shift(); // Keep only the last 10 entries
-            }
-
             const selection = window.getSelection();
             const range = document.createRange();
             range.selectNodeContents(paragraph);
@@ -388,11 +377,6 @@
             // Update the count and save changes
             updateCounts();
             saveText();
-
-            // Show the Undo button if there are entries in the undo stack
-            if (undoStack.length > 0) {
-                document.querySelector('.undo-button').style.display = 'block';
-            }
         }
 
         function cleanupSpaces() {
@@ -462,34 +446,6 @@
             document.body.removeChild(tempTextarea);
         }
 
-        function undoLastCut() {
-            if (undoStack.length === 0) return;
-
-            const lastCut = undoStack.pop();
-
-            // Restore the text to the input textarea
-            const inputText = document.getElementById('inputText').value;
-            document.getElementById('inputText').value = `${lastCut}\n\n${inputText}`;
-
-            // Restore the text to the output container
-            const outputContainer = document.getElementById('output');
-            const p = document.createElement('p');
-            p.innerHTML = lastCut.replace(/\n/g, '<br>');
-            outputContainer.insertBefore(p, outputContainer.firstChild);
-
-            // Update daily ad count
-            dailyAdCount--;
-
-            // Update the counts and save changes
-            updateCounts();
-            saveText();
-
-            // Hide the Undo button if there are no entries left in the undo stack
-            if (undoStack.length === 0) {
-                document.querySelector('.undo-button').style.display = 'none';
-            }
-        }
-
         function login() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
@@ -505,7 +461,6 @@
                 document.getElementById('countryCount').style.display = 'block';
                 document.querySelector('.copy-button').style.display = 'block';
                 document.getElementById('output').style.display = 'block';
-                document.querySelector('.undo-button').style.display = 'block';
                 loadText();
             } else {
                 alert('Please enter both username and password.');
