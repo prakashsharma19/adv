@@ -171,6 +171,7 @@
     <div id="remainingTime" style="display:none;">Remaining Time: <span id="time"></span><div class="hourglass"></div></div>
     <div id="countryCount" style="display:none;"></div>
     <button class="copy-button" style="display:none;" onclick="copyRemainingText()">Copy Remaining Text</button>
+    <button class="copy-button" id="undoButton" style="display:none;" onclick="undoLastCut()">Undo Last Cut</button>
     <div id="output" class="text-container" style="display:none;" contenteditable="true"></div>
 
     <!-- Option to choose cut method -->
@@ -216,6 +217,7 @@
         let currentUser = null;
         let dailyAdCount = 0;
         let totalTimeInSeconds = 0;
+        let cutHistory = [];
 
         // Function to save text to localStorage for the current user
         function saveText() {
@@ -346,6 +348,8 @@
 
         function cutParagraph(paragraph) {
             const textToCopy = paragraph.innerText;
+            cutHistory.push(textToCopy); // Save the cut text to the history stack
+
             const selection = window.getSelection();
             const range = document.createRange();
             range.selectNodeContents(paragraph);
@@ -377,6 +381,38 @@
             // Update the count and save changes
             updateCounts();
             saveText();
+
+            // Show the undo button
+            document.getElementById('undoButton').style.display = 'block';
+        }
+
+        // Function to undo the last cut
+        function undoLastCut() {
+            if (cutHistory.length > 0) {
+                const lastCutText = cutHistory.pop(); // Get the last cut text
+
+                // Restore the text in the output container
+                const outputContainer = document.getElementById('output');
+                const p = document.createElement('p');
+                p.innerText = lastCutText;
+                outputContainer.insertBefore(p, outputContainer.firstChild);
+
+                // Update the input textarea by adding back the restored text
+                const inputText = document.getElementById('inputText').value;
+                document.getElementById('inputText').value = `${lastCutText}\n${inputText}`.trim();
+
+                // Update the daily ad count
+                dailyAdCount--;
+
+                // Update the count and save changes
+                updateCounts();
+                saveText();
+
+                // Hide the undo button if there's nothing to undo
+                if (cutHistory.length === 0) {
+                    document.getElementById('undoButton').style.display = 'none';
+                }
+            }
         }
 
         function cleanupSpaces() {
