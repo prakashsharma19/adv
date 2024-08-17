@@ -1,56 +1,131 @@
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advertisements-PPH</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #ADD8E6; /* Light blue background color */
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f4f4f4;
             padding: 20px;
-            position: relative;
+            margin: 0;
+            color: #333;
         }
-        .input-container {
+
+        h1 {
+            color: #1171ba;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .font-controls,
+        .login-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            flex-direction: column;
         }
+
         .text-container {
-            margin: 20px 0;
-            padding: 10px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            cursor: text;
-            white-space: pre-wrap; /* Maintain text format */
+            background-color: #ffffff;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            white-space: pre-wrap;
             position: relative;
+            margin-top: 20px;
+            z-index: 2;
         }
+
         .text-container p {
-            margin: 10px 0;
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            line-height: 1.5;
         }
-        .copy-button {
-            background-color: #4CAF50; /* Green */
+
+        .copy-button,
+        #okButton,
+        #loginButton,
+        #undoButton,
+        #lockButton {
+            background-color: #1171ba;
             border: none;
             color: white;
             padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
             font-size: 16px;
             cursor: pointer;
-            transition-duration: 0.4s;
-            margin: 5px;
-        }
-        .copy-button:hover {
-            background-color: white;
-            color: black;
-            border: 2px solid #4CAF50;
-        }
-        #adCount, #dailyAdCount, #remainingTime, #countryCount {
+            border-radius: 5px;
+            transition: background-color 0.3s;
             margin-top: 10px;
+        }
+
+        .copy-button:hover,
+        #okButton:hover,
+        #loginButton:hover,
+        #undoButton:hover,
+        #lockButton:hover {
+            background-color: #0e619f;
+        }
+
+        .input-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .input-container textarea {
+            width: 100%;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #e0e0e0;
+            margin-top: 10px;
+        }
+
+        .input-container .container-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background-color: #1171ba;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .rough-container {
+            width: 30%;
+            margin-left: 2%;
+        }
+
+        .input-boxes {
+            display: none;
+        }
+
+        #okButton {
+            align-self: flex-end;
+            margin-top: 10px;
+        }
+
+        #adCount,
+        #dailyAdCount,
+        #remainingTime,
+        #countryCount {
+            margin-top: 15px;
             font-size: 18px;
             font-weight: bold;
+            color: #2c3e50;
         }
+
+        #remainingTime .hourglass {
+            vertical-align: middle;
+        }
+
         #countryCount {
             position: absolute;
             left: 20px;
@@ -58,81 +133,45 @@
             font-size: 16px;
             font-weight: bold;
             line-height: 1.5;
+            color: #34495e;
         }
-        #remainingTime {
-            margin-top: 10px;
-        }
-        .font-controls {
-            margin-bottom: 10px;
-        }
-        #okButton {
-            background-color: #4CAF50; /* Green */
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            transition-duration: 0.4s;
-        }
-        #okButton:hover {
-            background-color: white;
-            color: black;
-            border: 2px solid #4CAF50;
-        }
+
         #cursorStart {
             font-weight: bold;
-            color: red;
+            color: #e74c3c;
         }
+
         #credits {
             position: absolute;
             top: 20px;
             right: 20px;
             font-size: 16px;
+            color: #34495e;
         }
+
         #credits a {
-            color: #0000EE;
+            color: #1171ba;
             text-decoration: none;
         }
+
         #credits a:hover {
             text-decoration: underline;
         }
+
         .error {
-            color: red;
+            color: #e74c3c;
             font-weight: bold;
         }
-        .login-container {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+
         .login-container input {
+            width: 100%;
             margin: 5px 0;
             padding: 10px;
             font-size: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
         }
-        #loginButton {
-            background-color: #4CAF50; /* Green */
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 10px 0;
-            cursor: pointer;
-            transition-duration: 0.4s;
-        }
-        #loginButton:hover {
-            background-color: white;
-            color: black;
-            border: 2px solid #4CAF50;
-        }
+
         .hourglass {
             width: 24px;
             height: 24px;
@@ -141,15 +180,53 @@
             display: inline-block;
             margin-left: 10px;
         }
+
+        .option-buttons {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .option-buttons label {
+            margin-right: 20px;
+        }
+
+        #undoButton {
+            margin-left: 20px;
+        }
+
+        #lockButton {
+            margin-left: 20px;
+        }
+
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
+
 <body>
     <h1>Advertisements-PPH</h1>
+
+    <!-- Option to choose cut method -->
+    <div class="option-buttons">
+        <label>
+            <input type="radio" name="cutOption" value="keyboard" checked>
+            Operate by Keyboard (Down Arrow Key)
+        </label>
+        <label>
+            <input type="radio" name="cutOption" value="mouse">
+            Operate by Mouse (Left Button)
+        </label>
+    </div>
+
     <div class="login-container">
         <input type="text" id="username" placeholder="Enter your name">
         <input type="password" id="password" placeholder="Enter your password">
         <button id="loginButton" onclick="login()">Login</button>
     </div>
+
     <div class="font-controls" style="display:none;">
         <label for="fontStyle">Font Style:</label>
         <select id="fontStyle" onchange="updateFont()">
@@ -162,32 +239,46 @@
         <label for="fontSize">Font Size:</label>
         <input type="number" id="fontSize" value="16" onchange="updateFont()">px
     </div>
-    <div class="input-container" style="display:none;">
-        <textarea id="inputText" rows="10" cols="50" placeholder="Paste your text here..."></textarea>
-        <button id="okButton" onclick="processText()">OK</button>
-    </div>
-    <div id="adCount" style="display:none;">Total Advertisements: 0</div>
-    <div id="dailyAdCount" style="display:none;">Total Ads Today: 0</div>
-    <div id="remainingTime" style="display:none;">Remaining Time: <span id="time"></span><div class="hourglass"></div></div>
-    <div id="countryCount" style="display:none;"></div>
-    <button class="copy-button" style="display:none;" onclick="copyRemainingText()">Copy Remaining Text</button>
-    <button class="copy-button" id="undoButton" style="display:none;" onclick="undoLastCut()">Undo Last Cut</button>
-    <div id="output" class="text-container" style="display:none;" contenteditable="true"></div>
 
-    <!-- Option to choose cut method -->
-    <div style="margin-top: 20px;">
-        <label>
-            <input type="radio" name="cutOption" value="keyboard" checked>
-            Operate by Keyboard (Down Arrow Key)
-        </label>
-        <label>
-            <input type="radio" name="cutOption" value="mouse">
-            Operate by Mouse (Left Button)
-        </label>
+    <div class="input-container" style="display:none;">
+        <div class="container-header" onclick="toggleBox('pasteBox')">
+            Paste your text here
+            <span id="pasteBoxToggle">[+]</span>
+        </div>
+        <div id="pasteBox" class="input-boxes">
+            <textarea id="inputText" rows="5" placeholder="Paste your text here..."></textarea>
+            <button id="okButton" onclick="processText()">OK</button>
+        </div>
+    </div>
+
+    <div class="input-container" style="display:none;">
+        <div class="container-header" onclick="toggleBox('roughBox')">
+            Rough Work
+            <span id="roughBoxToggle">[+]</span>
+        </div>
+        <div id="roughBox" class="input-boxes rough-container">
+            <textarea id="roughText" rows="5" placeholder="Rough Work..."></textarea>
+        </div>
+    </div>
+
+    <div class="top-controls" style="display:none;">
+        <div id="remainingTime">File completed by: <span id="time"></span>
+            <div class="hourglass"></div>
+        </div>
+        <button id="undoButton" style="display:none;" onclick="undoLastCut()">Undo Last Cut</button>
+        <button id="lockButton" style="display:none;" onclick="toggleLock()">🔒 Lock</button>
+    </div>
+
+    <div id="adCount" style="display:none;">Total Advertisements: 0</div>
+    <div id="dailyAdCount" style="display:none;">Total Ads Sent Today: 0</div>
+    <div id="countryCount" style="display:none;"></div>
+
+    <div id="output" class="text-container" style="display:none;" contenteditable="true">
+        <p id="cursorStart">Place your cursor here</p>
     </div>
 
     <div id="credits">
-        This page is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
+        This tool is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
     </div>
 
     <script>
@@ -218,28 +309,33 @@
         let dailyAdCount = 0;
         let totalTimeInSeconds = 0;
         let cutHistory = [];
+        let isLocked = false;
 
-        // Function to save text to localStorage for the current user
         function saveText() {
             const inputText = document.getElementById('inputText').value;
+            const roughText = document.getElementById('roughText').value;
             const outputText = document.getElementById('output').innerHTML;
             if (currentUser) {
                 localStorage.setItem(`savedInput_${currentUser}`, inputText);
+                localStorage.setItem(`savedRough_${currentUser}`, roughText);
                 localStorage.setItem(`savedOutput_${currentUser}`, outputText);
                 localStorage.setItem(`dailyAdCount_${currentUser}`, dailyAdCount);
                 localStorage.setItem(`lastCutTime_${currentUser}`, Date.now());
             }
         }
 
-        // Function to load text from localStorage for the current user
         function loadText() {
             if (currentUser) {
                 const savedInput = localStorage.getItem(`savedInput_${currentUser}`);
+                const savedRough = localStorage.getItem(`savedRough_${currentUser}`);
                 const savedOutput = localStorage.getItem(`savedOutput_${currentUser}`);
                 const savedDailyAdCount = localStorage.getItem(`dailyAdCount_${currentUser}`);
                 const lastCutTime = localStorage.getItem(`lastCutTime_${currentUser}`);
                 if (savedInput) {
                     document.getElementById('inputText').value = savedInput;
+                }
+                if (savedRough) {
+                    document.getElementById('roughText').value = savedRough;
                 }
                 if (savedOutput) {
                     document.getElementById('output').innerHTML = savedOutput;
@@ -268,7 +364,7 @@
                 const line = lines[i].trim();
                 const nextLine = lines[i + 1].trim();
 
-                if (nextLine.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)) { // Check if next line is an email
+                if (nextLine.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)) {
                     countryList.forEach(country => {
                         if (line.includes(country)) {
                             countryCounts[country] = (countryCounts[country] || 0) + 1;
@@ -315,13 +411,13 @@
             const outputContainer = document.getElementById('output');
             outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
 
-            // Calculate total time for all ads
             const totalAds = countOccurrences(inputText, 'professor');
             totalTimeInSeconds = totalAds * 8;
 
             let index = 0;
+
             function processChunk() {
-                const chunkSize = 100; // Number of paragraphs to process in one go
+                const chunkSize = 100;
                 const end = Math.min(index + chunkSize, paragraphs.length);
                 for (; index < end; index++) {
                     const paragraph = paragraphs[index];
@@ -329,18 +425,14 @@
                         const p = document.createElement('p');
                         p.innerHTML = highlightErrors(paragraph.replace(/\n/g, '<br>'));
                         outputContainer.appendChild(p);
-
-                        // Add a gap after each paragraph for smooth cursor movement
-                        const gap = document.createElement('div');
-                        gap.innerHTML = '<br><br>'; // Add larger gap
-                        outputContainer.appendChild(gap);
                     }
                 }
                 if (index < paragraphs.length) {
                     requestAnimationFrame(processChunk);
                 } else {
                     updateCounts();
-                    saveText(); // Save text to localStorage for the current user
+                    saveText();
+                    document.getElementById('lockButton').style.display = 'inline-block';
                 }
             }
             requestAnimationFrame(processChunk);
@@ -348,7 +440,7 @@
 
         function cutParagraph(paragraph) {
             const textToCopy = paragraph.innerText;
-            cutHistory.push(textToCopy); // Save the cut text to the history stack
+            cutHistory.push(textToCopy);
 
             const selection = window.getSelection();
             const range = document.createRange();
@@ -356,7 +448,6 @@
             selection.removeAllRanges();
             selection.addRange(range);
 
-            // Copy the text without formatting
             const tempTextarea = document.createElement('textarea');
             tempTextarea.style.position = 'fixed';
             tempTextarea.style.opacity = '0';
@@ -366,49 +457,38 @@
             document.execCommand('copy');
             document.body.removeChild(tempTextarea);
 
-            // Remove the paragraph and cleanup
             paragraph.remove();
             cleanupSpaces();
 
-            // Update the input textarea by removing the corresponding text
             const inputText = document.getElementById('inputText').value;
             const updatedText = inputText.replace(textToCopy, '').trim();
             document.getElementById('inputText').value = updatedText;
 
-            // Update the daily ad count
             dailyAdCount++;
 
-            // Update the count and save changes
             updateCounts();
             saveText();
 
-            // Show the undo button
             document.getElementById('undoButton').style.display = 'block';
         }
 
-        // Function to undo the last cut
         function undoLastCut() {
             if (cutHistory.length > 0) {
-                const lastCutText = cutHistory.pop(); // Get the last cut text
+                const lastCutText = cutHistory.pop();
 
-                // Restore the text in the output container
                 const outputContainer = document.getElementById('output');
                 const p = document.createElement('p');
                 p.innerText = lastCutText;
                 outputContainer.insertBefore(p, outputContainer.firstChild);
 
-                // Update the input textarea by adding back the restored text
                 const inputText = document.getElementById('inputText').value;
                 document.getElementById('inputText').value = `${lastCutText}\n${inputText}`.trim();
 
-                // Update the daily ad count
                 dailyAdCount--;
 
-                // Update the count and save changes
                 updateCounts();
                 saveText();
 
-                // Hide the undo button if there's nothing to undo
                 if (cutHistory.length === 0) {
                     document.getElementById('undoButton').style.display = 'none';
                 }
@@ -417,7 +497,7 @@
 
         function cleanupSpaces() {
             const outputContainer = document.getElementById('output');
-            const paragraphs = outputContainer.querySelectorAll('p, div');
+            const paragraphs = outputContainer.querySelectorAll('p');
             paragraphs.forEach(paragraph => {
                 if (!paragraph.innerText.trim()) {
                     paragraph.remove();
@@ -431,7 +511,6 @@
                 const range = selection.getRangeAt(0);
                 const container = range.commonAncestorContainer;
 
-                // Check if the cursor is inside a paragraph containing "Professor"
                 let paragraph = container;
                 while (paragraph && paragraph.nodeName !== 'P') {
                     paragraph = paragraph.parentNode;
@@ -440,7 +519,6 @@
                 if (paragraph && paragraph.textContent.includes('Professor')) {
                     cutParagraph(paragraph);
 
-                    // Set focus back to the text container after cutting
                     document.getElementById('output').focus();
                 }
             }
@@ -469,17 +547,39 @@
             document.getElementById('output').style.fontSize = `${fontSize}px`;
         }
 
-        function copyRemainingText() {
-            const outputContainer = document.getElementById('output');
-            const remainingText = outputContainer.innerText;
-            const tempTextarea = document.createElement('textarea');
-            tempTextarea.style.position = 'fixed';
-            tempTextarea.style.opacity = '0';
-            tempTextarea.value = remainingText;
-            document.body.appendChild(tempTextarea);
-            tempTextarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextarea);
+        function toggleLock() {
+            const lockButton = document.getElementById('lockButton');
+            const interactiveElements = document.querySelectorAll('input, button, textarea, select');
+            isLocked = !isLocked;
+
+            if (isLocked) {
+                lockButton.innerHTML = '🔓 Unlock';
+                interactiveElements.forEach(element => {
+                    if (element.id !== 'output' && element.id !== 'undoButton' && element.id !== 'lockButton') {
+                        element.disabled = true;
+                    }
+                });
+            } else {
+                lockButton.innerHTML = '🔒 Lock';
+                interactiveElements.forEach(element => {
+                    if (element.id !== 'output' && element.id !== 'undoButton' && element.id !== 'lockButton') {
+                        element.disabled = false;
+                    }
+                });
+            }
+        }
+
+        function toggleBox(boxId) {
+            const box = document.getElementById(boxId);
+            const toggleSymbol = document.getElementById(boxId + 'Toggle');
+
+            if (box.style.display === 'none' || box.style.display === '') {
+                box.style.display = 'block';
+                toggleSymbol.innerText = '[-]';
+            } else {
+                box.style.display = 'none';
+                toggleSymbol.innerText = '[+]';
+            }
         }
 
         function login() {
@@ -490,12 +590,12 @@
                 currentUser = `${username}_${password}`;
                 document.querySelector('.login-container').style.display = 'none';
                 document.querySelector('.font-controls').style.display = 'block';
-                document.querySelector('.input-container').style.display = 'block';
+                document.querySelectorAll('.input-container').forEach(container => container.style.display = 'block');
+                document.querySelector('.top-controls').style.display = 'flex';
                 document.getElementById('adCount').style.display = 'block';
                 document.getElementById('dailyAdCount').style.display = 'block';
                 document.getElementById('remainingTime').style.display = 'block';
                 document.getElementById('countryCount').style.display = 'block';
-                document.querySelector('.copy-button').style.display = 'block';
                 document.getElementById('output').style.display = 'block';
                 loadText();
             } else {
@@ -505,7 +605,6 @@
 
         document.getElementById('output').addEventListener('click', function(event) {
             if (event.target.id === 'cursorStart') {
-                // Start monitoring cursor after clicking in the text container
                 startMonitoring();
             } else {
                 handleMouseClick(event);
@@ -516,7 +615,6 @@
             option.addEventListener('change', startMonitoring);
         });
 
-        // Check for daily reset of ad count
         function checkDailyReset() {
             const now = new Date();
             const lastCutTime = localStorage.getItem(`lastCutTime_${currentUser}`);
@@ -529,9 +627,8 @@
             }
         }
 
-        setInterval(checkDailyReset, 60000); // Check every minute
-
-        // No need to loadText on page load since it will be handled on login
+        setInterval(checkDailyReset, 60000);
     </script>
 </body>
+
 </html>
