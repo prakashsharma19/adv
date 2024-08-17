@@ -433,6 +433,9 @@
                     updateCounts();
                     saveText();
                     document.getElementById('lockButton').style.display = 'inline-block';
+
+                    // Move entries with 'Russia' to the end
+                    moveCountryEntriesToEnd('Russia');
                 }
             }
             requestAnimationFrame(processChunk);
@@ -628,6 +631,36 @@
         }
 
         setInterval(checkDailyReset, 60000);
+
+        function moveCountryEntriesToEnd(countryName) {
+            const outputContainer = document.getElementById('output');
+            const paragraphs = Array.from(outputContainer.querySelectorAll('p'));
+
+            // Separate the paragraphs containing the specific country
+            const paragraphsWithCountry = [];
+            const otherParagraphs = [];
+
+            paragraphs.forEach(paragraph => {
+                if (paragraph.innerText.includes(countryName)) {
+                    paragraphsWithCountry.push(paragraph);
+                } else {
+                    otherParagraphs.push(paragraph);
+                }
+            });
+
+            // Clear the current output
+            outputContainer.innerHTML = '';
+
+            // Append paragraphs without the specific country first
+            otherParagraphs.forEach(paragraph => {
+                outputContainer.appendChild(paragraph);
+            });
+
+            // Then append paragraphs containing the specific country
+            paragraphsWithCountry.forEach(paragraph => {
+                outputContainer.appendChild(paragraph);
+            });
+        }
     </script>
 </body>
 
