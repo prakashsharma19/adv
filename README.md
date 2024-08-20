@@ -11,6 +11,7 @@
             padding: 20px;
             margin: 0;
             color: #333;
+            position: relative;
         }
 
         h1 {
@@ -27,6 +28,45 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .font-controls select,
+        .font-controls input {
+            margin-left: 10px;
+        }
+
+        .fullscreen-button {
+            background-color: #1171ba;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+
+        .fullscreen-button:hover {
+            background-color: #0e619f;
+        }
+
+        .clear-memory-button {
+            background-color: red;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .clear-memory-button:hover {
+            background-color: darkred;
         }
 
         .text-container {
@@ -42,34 +82,53 @@
         }
 
         .text-container p {
-            margin: 0;
-            padding-bottom: 10px;
+            margin: 0 0 10px;
             border-bottom: 1px solid #e0e0e0;
             line-height: 1.5;
         }
 
         .copy-button,
         #okButton,
-        #loginButton,
         #undoButton,
-        #lockButton {
-            background-color: #1171ba;
+        #lockButton,
+        #startButton {
             border: none;
             color: white;
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
             border-radius: 5px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.1s ease;
             margin-top: 10px;
         }
 
-        .copy-button:hover,
-        #okButton:hover,
-        #loginButton:hover,
-        #undoButton:hover,
-        #lockButton:hover {
-            background-color: #0e619f;
+        #loginButton {
+            background-color: #28a745;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        #loginButton:hover {
+            background-color: #218838;
+        }
+
+        #loginButton:active {
+            transform: scale(0.95);
+        }
+
+        #lockButton {
+            margin-left: 20px;
+            background-color: #1171ba;
+        }
+
+        #undoButton {
+            margin-left: 20px;
+            background-color: #1171ba;
+        }
+
+        #startButton {
+            margin-left: 20px;
+            background-color: #28a745;
         }
 
         .input-container {
@@ -110,6 +169,7 @@
         #okButton {
             align-self: flex-end;
             margin-top: 10px;
+            background-color: #1171ba;
         }
 
         #adCount,
@@ -122,6 +182,14 @@
             color: #2c3e50;
         }
 
+        #loadingIndicator {
+            color: red;
+            margin-left: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            display: none;
+        }
+
         #remainingTime .hourglass {
             vertical-align: middle;
         }
@@ -129,7 +197,7 @@
         #countryCount {
             position: absolute;
             left: 20px;
-            top: 150px;
+            top: 250px;
             font-size: 16px;
             font-weight: bold;
             line-height: 1.5;
@@ -138,7 +206,7 @@
 
         #cursorStart {
             font-weight: bold;
-            color: #e74c3c;
+            color: #3498db;
         }
 
         #credits {
@@ -161,6 +229,7 @@
         .error {
             color: #e74c3c;
             font-weight: bold;
+            font-style: italic;
         }
 
         .login-container input {
@@ -190,24 +259,149 @@
             margin-right: 20px;
         }
 
-        #undoButton {
-            margin-left: 20px;
-        }
-
-        #lockButton {
-            margin-left: 20px;
-        }
-
         .top-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .right-content {
+            position: absolute;
+            top: 250px;
+            right: 20px;
+            width: 150px;
+        }
+
+        #currentTime {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        #remainingTimeText {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        .reminder-heading {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        .reminder-slots {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: right;
+        }
+
+        .reminder-slots li {
+            background-color: #d3eaf7;
+            color: #333;
+            padding: 5px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s;
+        }
+
+        .reminder-slots li:hover,
+        .reminder-slots li.selected {
+            background-color: #1171ba;
+            color: white;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px;
+            background-color: #2c3e50;
+            color: white;
+            border: 2px solid #e74c3c;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .popup button {
+            background-color: #e74c3c;
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.1s ease;
+            margin-top: 20px;
+        }
+
+        .popup button:hover {
+            background-color: #c0392b;
+        }
+
+        .popup button:active {
+            transform: scale(0.95);
+        }
+
+        .popup img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+        }
+
+        .problem-heading {
+            color: #e74c3c;
+            font-style: italic;
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .reminder-note {
+            font-style: italic;
+            font-size: 12px;
+            text-align: right;
+            margin-top: 5px;
+            color: #333;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            height: 5px;
+            width: 0;
+            background-color: red;
+            transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out;
+            border-radius: 2px;
+            margin-top: 10px;
         }
     </style>
 </head>
 
 <body>
     <h1>Advertisements-PPH</h1>
+
+    <!-- Clear memory button -->
+    <button class="clear-memory-button" onclick="clearMemory()">Clear Memory</button>
+
+    <!-- Credits in upper-right corner -->
+    <div id="credits">
+        This tool is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
+    </div>
 
     <!-- Option to choose cut method -->
     <div class="option-buttons">
@@ -238,6 +432,7 @@
         </select>
         <label for="fontSize">Font Size:</label>
         <input type="number" id="fontSize" value="16" onchange="updateFont()">px
+        <button class="fullscreen-button" onclick="toggleFullScreen()">Full Screen</button>
     </div>
 
     <div class="input-container" style="display:none;">
@@ -262,23 +457,45 @@
     </div>
 
     <div class="top-controls" style="display:none;">
-        <div id="remainingTime">File completed by: <span id="time"></span>
+        <div id="remainingTime">File completed by: <span id="remainingTimeText"></span>
             <div class="hourglass"></div>
         </div>
         <button id="undoButton" style="display:none;" onclick="undoLastCut()">Undo Last Cut</button>
         <button id="lockButton" style="display:none;" onclick="toggleLock()">🔒 Lock</button>
+        <button id="startButton" onclick="startProcessing()">Start</button>
     </div>
 
-    <div id="adCount" style="display:none;">Total Advertisements: 0</div>
+    <div id="adCount" style="display:none;">
+        Total Advertisements: <span id="totalAds">0</span>
+        <span id="loadingIndicator">Loading, please wait...</span>
+    </div>
     <div id="dailyAdCount" style="display:none;">Total Ads Sent Today: 0</div>
+    <div class="progress-bar" id="progressBar"></div>
     <div id="countryCount" style="display:none;"></div>
 
     <div id="output" class="text-container" style="display:none;" contenteditable="true">
         <p id="cursorStart">Place your cursor here</p>
     </div>
 
-    <div id="credits">
-        This tool is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
+    <div class="right-content">
+        <div id="currentTime"></div>
+        <div class="reminder-heading">Ad Slots:</div>
+        <ul class="reminder-slots">
+            <li data-time="09:00">9:00-9:30 AM</li>
+            <li data-time="10:35">10:35-10:45 AM</li>
+            <li data-time="11:50">11:50-12:00 PM</li>
+            <li data-time="13:05">1:05-1:10 PM</li>
+            <li data-time="14:20">2:20-2:30 PM</li>
+            <li data-time="15:40">3:40-3:45 PM</li>
+            <li data-time="16:50">4:50-5:00 PM</li>
+        </ul>
+        <div class="reminder-note">(Select your slots to get reminder)</div>
+    </div>
+
+    <div id="reminderPopup" class="popup">
+        <span style="font-size: 50px;">🔔</span>
+        <p>Send Ads</p>
+        <button onclick="dismissPopup()">OK</button>
     </div>
 
     <script>
@@ -310,6 +527,17 @@
         let totalTimeInSeconds = 0;
         let cutHistory = [];
         let isLocked = false;
+        let isProcessing = false; // Flag to prevent multiple processing
+
+        function clearMemory() {
+            const password = prompt('Please enter the password to clear memory:');
+            if (password === 'cleanall') {
+                localStorage.clear();
+                alert('Memory cleared!');
+            } else {
+                alert('Incorrect password. Memory not cleared.');
+            }
+        }
 
         function saveText() {
             const inputText = document.getElementById('inputText').value;
@@ -321,6 +549,7 @@
                 localStorage.setItem(`savedOutput_${currentUser}`, outputText);
                 localStorage.setItem(`dailyAdCount_${currentUser}`, dailyAdCount);
                 localStorage.setItem(`lastCutTime_${currentUser}`, Date.now());
+                saveSelectedReminders();
             }
         }
 
@@ -347,7 +576,11 @@
                         dailyAdCount = parseInt(savedDailyAdCount, 10);
                     }
                 }
+                loadSelectedReminders();
                 updateCounts();
+                updateRemainingTime(); // Ensure remaining time is updated on login
+                ensureProblemHeading();
+                document.getElementById('lockButton').style.display = 'inline-block';
             }
         }
 
@@ -376,14 +609,21 @@
         }
 
         function highlightErrors(text) {
-            return text.replace(/(\w+\?\w+)/g, '<span class="error">$1</span>');
+            let modifiedText = text.replace(/\?/g, '<span class="error">?</span>');
+            if (!text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)) {
+                modifiedText += ' <span class="error">Missing email</span>';
+            }
+            if (!countryList.some(country => text.includes(country))) {
+                modifiedText += ' <span class="error">Missing country</span>';
+            }
+            return modifiedText;
         }
 
         function updateCounts() {
             const outputContainer = document.getElementById('output');
             const text = outputContainer.innerText;
             const adCount = countOccurrences(text, 'professor');
-            document.getElementById('adCount').innerText = `Total Advertisements: ${adCount}`;
+            document.getElementById('totalAds').innerText = adCount;
             document.getElementById('dailyAdCount').innerText = `Total Ads Today: ${dailyAdCount}`;
 
             const countryCounts = countCountryOccurrences(text);
@@ -395,21 +635,42 @@
             document.getElementById('countryCount').innerHTML = countryCountText.trim();
 
             updateRemainingTime();
+            updateProgressBar(dailyAdCount);
+        }
+
+        function updateProgressBar(dailyAdCount) {
+            const progressBar = document.getElementById('progressBar');
+            const maxCount = 1200; // Number of entries for the bar to be fully filled
+
+            const percentage = Math.min(dailyAdCount / maxCount, 1) * 100;
+            progressBar.style.width = `${percentage}%`;
+
+            // RGB transition from red to green
+            const red = Math.max(255 - Math.floor((dailyAdCount / maxCount) * 255), 0);
+            const green = Math.min(Math.floor((dailyAdCount / maxCount) * 255), 255);
+            progressBar.style.backgroundColor = `rgb(${red},${green},0)`;
         }
 
         function updateRemainingTime() {
-            const remainingTimeInSeconds = totalTimeInSeconds - (dailyAdCount * 8);
+            const adCount = document.getElementById('totalAds').innerText;
+            const remainingTimeInMinutes = adCount / 9; // Calculating based on total ads (9 ads/min)
+            const remainingTimeInSeconds = remainingTimeInMinutes * 60;
             const hours = Math.floor(remainingTimeInSeconds / 3600);
             const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
 
-            document.getElementById('time').innerText = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+            document.getElementById('remainingTimeText').innerText = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
         }
 
         function processText() {
+            if (isProcessing) return; // Prevent multiple processing
+
+            isProcessing = true;
+            document.getElementById('loadingIndicator').style.display = 'inline'; // Show loading indicator
+
             const inputText = document.getElementById('inputText').value;
-            const paragraphs = inputText.split('\n\n');
+            const paragraphs = inputText.split(/\n\n/); // Separate paragraphs more reliably
             const outputContainer = document.getElementById('output');
-            outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
+            outputContainer.innerHTML = ''; // Clear existing content
 
             const totalAds = countOccurrences(inputText, 'professor');
             totalTimeInSeconds = totalAds * 8;
@@ -417,7 +678,7 @@
             let index = 0;
 
             function processChunk() {
-                const chunkSize = 100;
+                const chunkSize = 10; // Reduce chunk size for better separation
                 const end = Math.min(index + chunkSize, paragraphs.length);
                 for (; index < end; index++) {
                     const paragraph = paragraphs[index];
@@ -434,11 +695,65 @@
                     saveText();
                     document.getElementById('lockButton').style.display = 'inline-block';
 
-                    // Move entries with 'Russia' to the end
-                    moveCountryEntriesToEnd('Russia');
+                    // Move error entries last, including "Russia"
+                    moveEntriesToEnd('Russia', outputContainer, true);
+                    ensureProblemHeading(); // Ensure problem heading is added
+
+                    document.getElementById('loadingIndicator').style.display = 'none'; // Hide loading indicator
+                    isProcessing = false; // Reset processing flag
                 }
             }
             requestAnimationFrame(processChunk);
+        }
+
+        function startProcessing() {
+            processText(); // Ensure it only processes the text once
+        }
+
+        function ensureProblemHeading() {
+            const outputContainer = document.getElementById('output');
+            if (!document.querySelector('.problem-heading')) {
+                const problemHeading = document.createElement('p');
+                problemHeading.className = 'problem-heading';
+                problemHeading.innerText = 'Check before sent';
+                outputContainer.appendChild(problemHeading);
+            }
+        }
+
+        function moveEntriesToEnd(keyword, outputContainer, includeErrors = false) {
+            const paragraphs = Array.from(outputContainer.querySelectorAll('p'));
+
+            const paragraphsWithKeyword = [];
+            const paragraphsWithProblems = [];
+            const otherParagraphs = [];
+
+            paragraphs.forEach(paragraph => {
+                const text = paragraph.innerText;
+                const hasError = text.includes('?') || text.includes('Missing email') || text.includes('Missing country');
+                if (text.includes(keyword) && !hasError) {
+                    paragraphsWithKeyword.push(paragraph);
+                } else if (includeErrors && hasError) {
+                    paragraphsWithProblems.push(paragraph);
+                } else {
+                    otherParagraphs.push(paragraph);
+                }
+            });
+
+            outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
+            otherParagraphs.forEach(paragraph => {
+                outputContainer.appendChild(paragraph);
+            });
+
+            paragraphsWithKeyword.forEach(paragraph => {
+                outputContainer.appendChild(paragraph);
+            });
+
+            if (paragraphsWithProblems.length > 0) {
+                ensureProblemHeading();
+                paragraphsWithProblems.forEach(paragraph => {
+                    outputContainer.appendChild(paragraph);
+                });
+            }
         }
 
         function cutParagraph(paragraph) {
@@ -465,7 +780,7 @@
 
             const inputText = document.getElementById('inputText').value;
             const updatedText = inputText.replace(textToCopy, '').trim();
-            document.getElementById('inputText').value = updatedText;
+            document.getElementById('inputText').value = updatedText ? updatedText + "\n\n" : updatedText;
 
             dailyAdCount++;
 
@@ -485,7 +800,7 @@
                 outputContainer.insertBefore(p, outputContainer.firstChild);
 
                 const inputText = document.getElementById('inputText').value;
-                document.getElementById('inputText').value = `${lastCutText}\n${inputText}`.trim();
+                document.getElementById('inputText').value = `${lastCutText}\n\n${inputText}`.trim();
 
                 dailyAdCount--;
 
@@ -632,35 +947,140 @@
 
         setInterval(checkDailyReset, 60000);
 
-        function moveCountryEntriesToEnd(countryName) {
-            const outputContainer = document.getElementById('output');
-            const paragraphs = Array.from(outputContainer.querySelectorAll('p'));
+        // Function to display the current time
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}:${seconds}`;
+        }
 
-            // Separate the paragraphs containing the specific country
-            const paragraphsWithCountry = [];
-            const otherParagraphs = [];
+        // Update time every second
+        setInterval(updateTime, 1000);
 
-            paragraphs.forEach(paragraph => {
-                if (paragraph.innerText.includes(countryName)) {
-                    paragraphsWithCountry.push(paragraph);
-                } else {
-                    otherParagraphs.push(paragraph);
+        // Function to check if the selected time slot matches the current time
+        function checkReminders() {
+            const now = new Date();
+            const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+            document.querySelectorAll('.reminder-slots li.selected').forEach(slot => {
+                if (slot.dataset.time === currentTime) {
+                    showPopup();
+                    showNotification('Ad Reminder', `It's time to send ads for ${slot.dataset.time}`);
+                    blinkBrowserIcon(); // Blink browser icon for attention
                 }
             });
-
-            // Clear the current output
-            outputContainer.innerHTML = '';
-
-            // Append paragraphs without the specific country first
-            otherParagraphs.forEach(paragraph => {
-                outputContainer.appendChild(paragraph);
-            });
-
-            // Then append paragraphs containing the specific country
-            paragraphsWithCountry.forEach(paragraph => {
-                outputContainer.appendChild(paragraph);
-            });
         }
+
+        // Check reminders every minute
+        setInterval(checkReminders, 60000);
+
+        // Show the reminder popup
+        function showPopup() {
+            document.getElementById('reminderPopup').style.display = 'block';
+            blinkTab();
+        }
+
+        // Dismiss the reminder popup
+        function dismissPopup() {
+            document.getElementById('reminderPopup').style.display = 'none';
+            document.title = originalTitle;
+            clearInterval(blinkInterval);
+        }
+
+        // Handle slot selection and saving
+        document.querySelectorAll('.reminder-slots li').forEach(slot => {
+            slot.addEventListener('click', () => {
+                slot.classList.toggle('selected');
+                saveSelectedReminders();
+            });
+        });
+
+        function saveSelectedReminders() {
+            const selectedSlots = [];
+            document.querySelectorAll('.reminder-slots li.selected').forEach(slot => {
+                selectedSlots.push(slot.dataset.time);
+            });
+            localStorage.setItem(`selectedReminders_${currentUser}`, JSON.stringify(selectedSlots));
+        }
+
+        function loadSelectedReminders() {
+            const savedSlots = localStorage.getItem(`selectedReminders_${currentUser}`);
+            if (savedSlots) {
+                const selectedSlots = JSON.parse(savedSlots);
+                document.querySelectorAll('.reminder-slots li').forEach(slot => {
+                    if (selectedSlots.includes(slot.dataset.time)) {
+                        slot.classList.add('selected');
+                    }
+                });
+            }
+        }
+
+        // Blink tab title when minimized
+        let originalTitle = document.title;
+        let blinkInterval;
+
+        function blinkTab() {
+            let isOriginalTitle = true;
+            blinkInterval = setInterval(() => {
+                document.title = isOriginalTitle ? '🔔 Reminder: Send Ads!' : originalTitle;
+                isOriginalTitle = !isOriginalTitle;
+            }, 1000);
+        }
+
+        // Toggle Fullscreen Mode
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                document.querySelector('.fullscreen-button').textContent = 'Normal Screen';
+            } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+                document.querySelector('.fullscreen-button').textContent = 'Full Screen';
+            }
+        }
+
+        // Show Desktop Notification
+        function showNotification(title, body) {
+            if (Notification.permission === 'granted') {
+                new Notification(title, { body });
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        new Notification(title, { body });
+                    }
+                });
+            }
+        }
+
+        // Blink browser icon
+        function blinkBrowserIcon() {
+            if (document.hidden) {
+                const favicon = document.querySelector('link[rel="icon"]');
+                const originalIcon = favicon.href;
+                let isOriginalIcon = true;
+                const attentionIcon = 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Alarm_bell.png/600px-Alarm_bell.png';
+
+                const blinkFavicon = setInterval(() => {
+                    favicon.href = isOriginalIcon ? attentionIcon : originalIcon;
+                    isOriginalIcon = !isOriginalIcon;
+                }, 500);
+
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden) {
+                        clearInterval(blinkFavicon);
+                        favicon.href = originalIcon;
+                    }
+                });
+            }
+        }
+
+        // Request Notification permission on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (Notification.permission !== 'granted') {
+                Notification.requestPermission();
+            }
+        });
     </script>
 </body>
 
