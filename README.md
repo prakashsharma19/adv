@@ -19,6 +19,14 @@
             text-align: center;
             margin-bottom: 30px;
             font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 img {
+            margin-right: 10px;
+            height: 28px;
         }
 
         .font-controls,
@@ -30,11 +38,12 @@
             margin-bottom: 20px;
             display: flex;
             align-items: center;
+            flex-direction: column;
         }
 
         .font-controls select,
         .font-controls input {
-            margin-left: 10px;
+            margin: 10px;
         }
 
         .fullscreen-button {
@@ -121,6 +130,10 @@
             background-color: #1171ba;
         }
 
+        #lockButton:hover {
+            background-color: #0e619f;
+        }
+
         #undoButton {
             margin-left: 20px;
             background-color: #1171ba;
@@ -135,6 +148,8 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
+            flex-direction: column;
+            align-items: center;
         }
 
         .input-container textarea {
@@ -209,27 +224,48 @@
             color: #3498db;
         }
 
-        #credits {
+        #userControls {
             position: absolute;
             top: 20px;
             right: 20px;
             font-size: 16px;
             color: #34495e;
+            display: flex;
+            align-items: center;
         }
 
-        #credits a {
-            color: #1171ba;
-            text-decoration: none;
+        #userControls img {
+            margin-right: 10px;
+            height: 28px;
         }
 
-        #credits a:hover {
-            text-decoration: underline;
+        #userControls span {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        #logoutButton {
+            background-color: #e74c3c;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #logoutButton:hover {
+            background-color: #c0392b;
         }
 
         .error {
             color: #e74c3c;
             font-weight: bold;
             font-style: italic;
+        }
+
+        .highlight-added {
+            background-color: #f4e542;
         }
 
         .login-container input {
@@ -389,18 +425,40 @@
             border-radius: 2px;
             margin-top: 10px;
         }
+
+        .scroll-locked {
+            overflow: hidden;
+        }
+
+        .scroll-lock-notice {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10000;
+            font-size: 14px;
+            display: none;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Advertisements-PPH</h1>
+    <h1>
+        <img src="https://raw.githubusercontent.com/prakashsharma19/hosted-images/main/pphlogo.png" alt="PPH Logo">
+        Advertisements-PPH
+    </h1>
 
     <!-- Clear memory button -->
     <button class="clear-memory-button" onclick="clearMemory()">Clear Memory</button>
 
-    <!-- Credits in upper-right corner -->
-    <div id="credits">
-        This tool is developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
+    <!-- User Controls in upper-right corner -->
+    <div id="userControls" style="display: none;">
+        <img src="https://raw.githubusercontent.com/prakashsharma19/hosted-images/main/pphlogo.png" alt="PPH Logo">
+        <span id="loggedInUser"></span>
+        <button id="logoutButton" onclick="logout()">Logout</button>
     </div>
 
     <!-- Option to choose cut method -->
@@ -432,6 +490,15 @@
         </select>
         <label for="fontSize">Font Size:</label>
         <input type="number" id="fontSize" value="16" onchange="updateFont()">px
+
+        <!-- Line Gap Option -->
+        <label for="lineGap">Line Gap:</label>
+        <select id="lineGap">
+            <option value="1">1 Line</option>
+            <option value="2">2 Lines</option>
+            <option value="3">3 Lines</option>
+        </select>
+        
         <button class="fullscreen-button" onclick="toggleFullScreen()">Full Screen</button>
     </div>
 
@@ -443,6 +510,18 @@
         <div id="pasteBox" class="input-boxes">
             <textarea id="inputText" rows="5" placeholder="Paste your text here..."></textarea>
             <button id="okButton" onclick="processText()">OK</button>
+        </div>
+    </div>
+
+    <!-- Incomplete Entries Box -->
+    <div class="input-container" style="display:none;">
+        <div class="container-header" onclick="toggleBox('incompleteBox')">
+            Incomplete Entries
+            <span id="incompleteBoxToggle">[+]</span>
+        </div>
+        <div id="incompleteBox" class="input-boxes">
+            <textarea id="incompleteText" rows="5" placeholder="Incomplete entries will be shown here..."></textarea>
+            <button onclick="copyIncompleteEntries()">Copy</button>
         </div>
     </div>
 
@@ -498,6 +577,9 @@
         <button onclick="dismissPopup()">OK</button>
     </div>
 
+    <!-- Scroll Lock Notice -->
+    <div id="scrollLockNotice" class="scroll-lock-notice">Scrolling is locked. Unlock to scroll.</div>
+
     <script>
         const countryList = [
             "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
@@ -524,10 +606,9 @@
 
         let currentUser = null;
         let dailyAdCount = 0;
-        let totalTimeInSeconds = 0;
         let cutHistory = [];
         let isLocked = false;
-        let isProcessing = false; // Flag to prevent multiple processing
+        let isProcessing = false;
 
         function clearMemory() {
             const password = prompt('Please enter the password to clear memory:');
@@ -543,10 +624,12 @@
             const inputText = document.getElementById('inputText').value;
             const roughText = document.getElementById('roughText').value;
             const outputText = document.getElementById('output').innerHTML;
+            const incompleteText = document.getElementById('incompleteText').value;
             if (currentUser) {
                 localStorage.setItem(`savedInput_${currentUser}`, inputText);
                 localStorage.setItem(`savedRough_${currentUser}`, roughText);
                 localStorage.setItem(`savedOutput_${currentUser}`, outputText);
+                localStorage.setItem(`savedIncomplete_${currentUser}`, incompleteText);
                 localStorage.setItem(`dailyAdCount_${currentUser}`, dailyAdCount);
                 localStorage.setItem(`lastCutTime_${currentUser}`, Date.now());
                 saveSelectedReminders();
@@ -558,6 +641,7 @@
                 const savedInput = localStorage.getItem(`savedInput_${currentUser}`);
                 const savedRough = localStorage.getItem(`savedRough_${currentUser}`);
                 const savedOutput = localStorage.getItem(`savedOutput_${currentUser}`);
+                const savedIncomplete = localStorage.getItem(`savedIncomplete_${currentUser}`);
                 const savedDailyAdCount = localStorage.getItem(`dailyAdCount_${currentUser}`);
                 const lastCutTime = localStorage.getItem(`lastCutTime_${currentUser}`);
                 if (savedInput) {
@@ -569,6 +653,9 @@
                 if (savedOutput) {
                     document.getElementById('output').innerHTML = savedOutput;
                 }
+                if (savedIncomplete) {
+                    document.getElementById('incompleteText').value = savedIncomplete;
+                }
                 if (savedDailyAdCount && lastCutTime) {
                     const lastCutDate = new Date(parseInt(lastCutTime, 10));
                     const currentDate = new Date();
@@ -578,8 +665,6 @@
                 }
                 loadSelectedReminders();
                 updateCounts();
-                updateRemainingTime(); // Ensure remaining time is updated on login
-                ensureProblemHeading();
                 document.getElementById('lockButton').style.display = 'inline-block';
             }
         }
@@ -621,11 +706,19 @@
 
         function updateCounts() {
             const outputContainer = document.getElementById('output');
-            const text = outputContainer.innerText;
-            const adCount = countOccurrences(text, 'professor');
+            const paragraphs = outputContainer.querySelectorAll('p');
+            let adCount = 0;
+
+            paragraphs.forEach(paragraph => {
+                if (paragraph.innerText.split('\n')[0].startsWith('Professor')) {
+                    adCount += 1;
+                }
+            });
+
             document.getElementById('totalAds').innerText = adCount;
             document.getElementById('dailyAdCount').innerText = `Total Ads Today: ${dailyAdCount}`;
 
+            const text = outputContainer.innerText;
             const countryCounts = countCountryOccurrences(text);
             const sortedCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
             let countryCountText = 'Country Counts:<br>';
@@ -634,126 +727,93 @@
             });
             document.getElementById('countryCount').innerHTML = countryCountText.trim();
 
-            updateRemainingTime();
             updateProgressBar(dailyAdCount);
+            updateRemainingTime(dailyAdCount);
         }
 
         function updateProgressBar(dailyAdCount) {
             const progressBar = document.getElementById('progressBar');
-            const maxCount = 1200; // Number of entries for the bar to be fully filled
+            const maxCount = 1800;
 
             const percentage = Math.min(dailyAdCount / maxCount, 1) * 100;
             progressBar.style.width = `${percentage}%`;
 
-            // RGB transition from red to green
             const red = Math.max(255 - Math.floor((dailyAdCount / maxCount) * 255), 0);
             const green = Math.min(Math.floor((dailyAdCount / maxCount) * 255), 255);
             progressBar.style.backgroundColor = `rgb(${red},${green},0)`;
         }
 
         function updateRemainingTime() {
-            const adCount = document.getElementById('totalAds').innerText;
-            const remainingTimeInMinutes = adCount / 9; // Calculating based on total ads (9 ads/min)
-            const remainingTimeInSeconds = remainingTimeInMinutes * 60;
-            const hours = Math.floor(remainingTimeInSeconds / 3600);
-            const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
+        const adCount = document.getElementById('totalAds').innerText;
+        const remainingTimeInMinutes = adCount / 9; // Calculating based on total ads (9 ads/min)
+        const remainingTimeInSeconds = remainingTimeInMinutes * 60;
+        const hours = Math.floor(remainingTimeInSeconds / 3600);
+        const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
 
             document.getElementById('remainingTimeText').innerText = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
         }
 
         function processText() {
-            if (isProcessing) return; // Prevent multiple processing
+            if (isProcessing) return;
 
             isProcessing = true;
-            document.getElementById('loadingIndicator').style.display = 'inline'; // Show loading indicator
+            document.getElementById('loadingIndicator').style.display = 'inline';
 
             const inputText = document.getElementById('inputText').value;
-            const paragraphs = inputText.split(/\n\n/); // Separate paragraphs more reliably
+            const paragraphs = inputText.split(/\n\s*\n/);
             const outputContainer = document.getElementById('output');
-            outputContainer.innerHTML = ''; // Clear existing content
+            const incompleteContainer = document.getElementById('incompleteText');
+            outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
+            incompleteContainer.value = '';
 
-            const totalAds = countOccurrences(inputText, 'professor');
-            totalTimeInSeconds = totalAds * 8;
-
+            const lineGap = parseInt(document.getElementById('lineGap').value, 10);
             let index = 0;
+            const nonRussiaEntries = [];
+            const russiaEntries = [];
 
             function processChunk() {
-                const chunkSize = 10; // Reduce chunk size for better separation
+                const chunkSize = 5;
                 const end = Math.min(index + chunkSize, paragraphs.length);
                 for (; index < end; index++) {
-                    const paragraph = paragraphs[index];
-                    if (paragraph.trim() !== '') {
-                        const p = document.createElement('p');
-                        p.innerHTML = highlightErrors(paragraph.replace(/\n/g, '<br>'));
-                        outputContainer.appendChild(p);
+                    let paragraph = paragraphs[index].trim();
+                    if (paragraph !== '') {
+                        const lines = paragraph.split('\n');
+                        const firstLine = lines[0].trim();
+                        const lastName = firstLine.split(' ').pop();
+
+                        const greeting = `\n\nDear Professor ${lastName},\n`;
+
+                        const highlightedText = highlightErrors(paragraph.replace(/\n/g, '<br>'));
+                        const hasError = highlightedText.includes('error');
+
+                        if (hasError) {
+                            incompleteContainer.value += `${highlightedText.replace(/<br>/g, '\n').replace(/<[^>]+>/g, '')}\n\n`;
+                        } else {
+                            const p = document.createElement('p');
+                            p.innerHTML = highlightedText + greeting;
+
+                            if (paragraph.includes('Russia')) {
+                                russiaEntries.push(p);
+                            } else {
+                                nonRussiaEntries.push(p);
+                            }
+                        }
                     }
                 }
                 if (index < paragraphs.length) {
                     requestAnimationFrame(processChunk);
                 } else {
+                    nonRussiaEntries.forEach(entry => outputContainer.appendChild(entry));
+                    russiaEntries.forEach(entry => outputContainer.appendChild(entry));
+
                     updateCounts();
                     saveText();
                     document.getElementById('lockButton').style.display = 'inline-block';
-
-                    // Move error entries last, including "Russia"
-                    moveEntriesToEnd('Russia', outputContainer, true);
-                    ensureProblemHeading(); // Ensure problem heading is added
-
-                    document.getElementById('loadingIndicator').style.display = 'none'; // Hide loading indicator
-                    isProcessing = false; // Reset processing flag
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                    isProcessing = false;
                 }
             }
             requestAnimationFrame(processChunk);
-        }
-
-        function startProcessing() {
-            processText(); // Ensure it only processes the text once
-        }
-
-        function ensureProblemHeading() {
-            const outputContainer = document.getElementById('output');
-            if (!document.querySelector('.problem-heading')) {
-                const problemHeading = document.createElement('p');
-                problemHeading.className = 'problem-heading';
-                problemHeading.innerText = 'Check before sent';
-                outputContainer.appendChild(problemHeading);
-            }
-        }
-
-        function moveEntriesToEnd(keyword, outputContainer, includeErrors = false) {
-            const paragraphs = Array.from(outputContainer.querySelectorAll('p'));
-
-            const paragraphsWithKeyword = [];
-            const paragraphsWithProblems = [];
-            const otherParagraphs = [];
-
-            paragraphs.forEach(paragraph => {
-                const text = paragraph.innerText;
-                const hasError = text.includes('?') || text.includes('Missing email') || text.includes('Missing country');
-                if (text.includes(keyword) && !hasError) {
-                    paragraphsWithKeyword.push(paragraph);
-                } else if (includeErrors && hasError) {
-                    paragraphsWithProblems.push(paragraph);
-                } else {
-                    otherParagraphs.push(paragraph);
-                }
-            });
-
-            outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
-            otherParagraphs.forEach(paragraph => {
-                outputContainer.appendChild(paragraph);
-            });
-
-            paragraphsWithKeyword.forEach(paragraph => {
-                outputContainer.appendChild(paragraph);
-            });
-
-            if (paragraphsWithProblems.length > 0) {
-                ensureProblemHeading();
-                paragraphsWithProblems.forEach(paragraph => {
-                    outputContainer.appendChild(paragraph);
-                });
-            }
         }
 
         function cutParagraph(paragraph) {
@@ -779,8 +839,8 @@
             cleanupSpaces();
 
             const inputText = document.getElementById('inputText').value;
-            const updatedText = inputText.replace(textToCopy, '').trim();
-            document.getElementById('inputText').value = updatedText ? updatedText + "\n\n" : updatedText;
+            const remainingText = inputText.replace(textToCopy.split('\nDear Professor')[0], '').trim();
+            document.getElementById('inputText').value = remainingText;
 
             dailyAdCount++;
 
@@ -877,6 +937,7 @@
                         element.disabled = true;
                     }
                 });
+                document.body.classList.add('scroll-locked');
             } else {
                 lockButton.innerHTML = '🔒 Lock';
                 interactiveElements.forEach(element => {
@@ -884,6 +945,7 @@
                         element.disabled = false;
                     }
                 });
+                document.body.classList.remove('scroll-locked');
             }
         }
 
@@ -915,10 +977,26 @@
                 document.getElementById('remainingTime').style.display = 'block';
                 document.getElementById('countryCount').style.display = 'block';
                 document.getElementById('output').style.display = 'block';
+                document.getElementById('userControls').style.display = 'flex';
+                document.getElementById('loggedInUser').innerText = username;
                 loadText();
             } else {
                 alert('Please enter both username and password.');
             }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.querySelector('.login-container').style.display = 'block';
+            document.querySelector('.font-controls').style.display = 'none';
+            document.querySelectorAll('.input-container').forEach(container => container.style.display = 'none');
+            document.querySelector('.top-controls').style.display = 'none';
+            document.getElementById('adCount').style.display = 'none';
+            document.getElementById('dailyAdCount').style.display = 'none';
+            document.getElementById('remainingTime').style.display = 'none';
+            document.getElementById('countryCount').style.display = 'none';
+            document.getElementById('output').style.display = 'none';
+            document.getElementById('userControls').style.display = 'none';
         }
 
         document.getElementById('output').addEventListener('click', function(event) {
@@ -968,7 +1046,7 @@
                 if (slot.dataset.time === currentTime) {
                     showPopup();
                     showNotification('Ad Reminder', `It's time to send ads for ${slot.dataset.time}`);
-                    blinkBrowserIcon(); // Blink browser icon for attention
+                    blinkBrowserIcon();
                 }
             });
         }
@@ -1081,6 +1159,51 @@
                 Notification.requestPermission();
             }
         });
+
+        // Copy incomplete entries to clipboard
+        function copyIncompleteEntries() {
+            const incompleteText = document.getElementById('incompleteText').value;
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.style.position = 'fixed';
+            tempTextarea.style.opacity = '0';
+            tempTextarea.value = incompleteText;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+            alert('Incomplete entries copied to clipboard!');
+        }
+
+        // Handle scrolling lock and display notice
+        document.addEventListener('wheel', function(event) {
+            if (isLocked) {
+                event.preventDefault();
+                const scrollLockNotice = document.getElementById('scrollLockNotice');
+                scrollLockNotice.style.display = 'block';
+                setTimeout(() => {
+                    scrollLockNotice.style.display = 'none';
+                }, 2000);
+            }
+        }, { passive: false });
+
+        // Move entries containing a specific keyword to the end of the container
+        function moveEntriesToEnd(keyword, container, isTextArea) {
+            if (isTextArea) {
+                const lines = container.value.trim().split("\n\n");
+                const filteredLines = lines.filter(line => line.includes(keyword));
+                const remainingLines = lines.filter(line => !line.includes(keyword));
+
+                container.value = [...remainingLines, ...filteredLines].join("\n\n");
+            } else {
+                const paragraphs = Array.from(container.querySelectorAll('p'));
+                const filteredParagraphs = paragraphs.filter(paragraph => paragraph.innerText.includes(keyword));
+                const remainingParagraphs = paragraphs.filter(paragraph => !paragraph.innerText.includes(keyword));
+
+                container.innerHTML = '';
+                remainingParagraphs.forEach(paragraph => container.appendChild(paragraph));
+                filteredParagraphs.forEach(paragraph => container.appendChild(paragraph));
+            }
+        }
     </script>
 </body>
 
