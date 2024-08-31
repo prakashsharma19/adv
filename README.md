@@ -745,7 +745,7 @@
 
         function updateRemainingTime() {
         const adCount = document.getElementById('totalAds').innerText;
-        const remainingTimeInMinutes = adCount / 9; // Calculating based on total ads (9 ads/min)
+        const remainingTimeInMinutes = adCount / 20; // Calculating based on total ads (20 ads/min)
         const remainingTimeInSeconds = remainingTimeInMinutes * 60;
         const hours = Math.floor(remainingTimeInSeconds / 3600);
         const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
