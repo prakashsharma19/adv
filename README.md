@@ -32,29 +32,53 @@
         .font-controls,
         .login-container {
             background-color: #ffffff;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             display: flex;
-            align-items: center;
             flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .font-controls .control-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 10px;
+        }
+
+        .font-controls label {
+            margin-right: 10px;
+            font-weight: bold;
+            color: #2c3e50;
         }
 
         .font-controls select,
         .font-controls input {
-            margin: 10px;
+            border-radius: 5px;
+            padding: 5px;
+            border: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        .font-controls input[type="number"] {
+            width: 50px;
         }
 
         .fullscreen-button {
             background-color: #1171ba;
             border: none;
             color: white;
-            padding: 10px 20px;
+            padding: 10px 15px;
             font-size: 16px;
             cursor: pointer;
             border-radius: 5px;
-            margin-left: 10px;
+            margin-top: 10px;
+            width: 100%;
         }
 
         .fullscreen-button:hover {
@@ -64,7 +88,7 @@
         .clear-memory-button {
             background-color: red;
             color: white;
-            padding: 10px 20px;
+            padding: 10px 15px;
             font-size: 16px;
             cursor: pointer;
             border-radius: 5px;
@@ -83,7 +107,6 @@
             padding: 15px;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             white-space: pre-wrap;
             position: relative;
             margin-top: 20px;
@@ -96,29 +119,33 @@
             line-height: 1.5;
         }
 
-        .copy-button,
-        #okButton,
         #undoButton,
-        #lockButton,
-        #startButton {
+        #lockButton {
             border: none;
             color: white;
-            padding: 10px 20px;
+            padding: 10px 15px;
             font-size: 16px;
             cursor: pointer;
             border-radius: 5px;
             transition: background-color 0.3s, transform 0.1s ease;
             margin-top: 10px;
+            width: 100%;
         }
 
         #loginButton {
-            background-color: #28a745;
+            background-color: #007bff;
             margin-top: 10px;
             font-size: 16px;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
         }
 
         #loginButton:hover {
-            background-color: #218838;
+            background-color: #0056b3;
         }
 
         #loginButton:active {
@@ -126,8 +153,11 @@
         }
 
         #lockButton {
-            margin-left: 20px;
             background-color: #1171ba;
+        }
+
+        #lockButton.locked {
+            background-color: #d9534f;
         }
 
         #lockButton:hover {
@@ -135,13 +165,7 @@
         }
 
         #undoButton {
-            margin-left: 20px;
             background-color: #1171ba;
-        }
-
-        #startButton {
-            margin-left: 20px;
-            background-color: #28a745;
         }
 
         .input-container {
@@ -286,19 +310,12 @@
             margin-left: 10px;
         }
 
-        .option-buttons {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .option-buttons label {
-            margin-right: 20px;
-        }
-
         .top-controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .right-content {
@@ -417,13 +434,20 @@
         }
 
         /* Progress bar */
-        .progress-bar {
+        .progress-bar-container {
+            width: 100%;
             height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
             width: 0;
-            background-color: red;
+            background-color: #f00;
             transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out;
-            border-radius: 2px;
-            margin-top: 10px;
         }
 
         .scroll-locked {
@@ -441,6 +465,81 @@
             z-index: 10000;
             font-size: 14px;
             display: none;
+        }
+
+        /* Animations */
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes vanish {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes explode {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        .fadeOut {
+            animation: fadeOut 0.3s forwards;
+        }
+
+        .vanish {
+            animation: vanish 0.3s forwards;
+        }
+
+        .explode {
+            animation: explode 0.3s forwards;
+        }
+
+        /* Credit Section */
+        #credit {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: #34495e;
+        }
+
+        #credit a {
+            color: #1171ba;
+            text-decoration: none;
+        }
+
+        #credit a:hover {
+            text-decoration: underline;
+        }
+
+        /* Right Sidebar for Buttons */
+        #rightSidebar {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
+            z-index: 999;
         }
     </style>
 </head>
@@ -461,18 +560,6 @@
         <button id="logoutButton" onclick="logout()">Logout</button>
     </div>
 
-    <!-- Option to choose cut method -->
-    <div class="option-buttons">
-        <label>
-            <input type="radio" name="cutOption" value="keyboard" checked>
-            Operate by Keyboard (Down Arrow Key)
-        </label>
-        <label>
-            <input type="radio" name="cutOption" value="mouse">
-            Operate by Mouse (Left Button)
-        </label>
-    </div>
-
     <div class="login-container">
         <input type="text" id="username" placeholder="Enter your name">
         <input type="password" id="password" placeholder="Enter your password">
@@ -480,26 +567,49 @@
     </div>
 
     <div class="font-controls" style="display:none;">
-        <label for="fontStyle">Font Style:</label>
-        <select id="fontStyle" onchange="updateFont()">
-            <option value="Arial">Arial</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Courier New">Courier New</option>
-            <option value="Georgia">Georgia</option>
-            <option value="Calibri Light">Calibri Light</option>
-        </select>
-        <label for="fontSize">Font Size:</label>
-        <input type="number" id="fontSize" value="16" onchange="updateFont()">px
+        <div class="control-group">
+            <div>
+                <label>
+                    <input type="radio" name="cutOption" value="keyboard" checked>
+                    Keyboard
+                </label>
+                <label>
+                    <input type="radio" name="cutOption" value="mouse">
+                    Mouse
+                </label>
+            </div>
 
-        <!-- Line Gap Option -->
-        <label for="lineGap">Line Gap:</label>
-        <select id="lineGap">
-            <option value="1">1 Line</option>
-            <option value="2">2 Lines</option>
-            <option value="3">3 Lines</option>
-        </select>
-        
-        <button class="fullscreen-button" onclick="toggleFullScreen()">Full Screen</button>
+            <div>
+                <label for="effectsToggle">Effects:</label>
+                <input type="checkbox" id="effectsToggle" onchange="saveEffectPreferences()">
+            </div>
+
+            <div>
+                <label for="effectType">Effect:</label>
+                <select id="effectType" onchange="saveEffectPreferences()">
+                    <option value="none">None</option>
+                    <option value="fadeOut">Fade Out</option>
+                    <option value="vanish">Vanish</option>
+                    <option value="explode">Explode</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="fontStyle">Font:</label>
+                <select id="fontStyle" onchange="updateFont()">
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Calibri Light">Calibri Light</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="fontSize">Size:</label>
+                <input type="number" id="fontSize" value="16" onchange="updateFont()">px
+            </div>
+        </div>
     </div>
 
     <div class="input-container" style="display:none;">
@@ -536,12 +646,9 @@
     </div>
 
     <div class="top-controls" style="display:none;">
-        <div id="remainingTime">File completed by: <span id="remainingTimeText"></span>
+        <div id="remainingTime">File completed by: <span id="remainingTimeText"></span> (<span id="completionPercentage">0%</span>)
             <div class="hourglass"></div>
         </div>
-        <button id="undoButton" style="display:none;" onclick="undoLastCut()">Undo Last Cut</button>
-        <button id="lockButton" style="display:none;" onclick="toggleLock()">🔒 Lock</button>
-        <button id="startButton" onclick="startProcessing()">Start</button>
     </div>
 
     <div id="adCount" style="display:none;">
@@ -549,7 +656,9 @@
         <span id="loadingIndicator">Loading, please wait...</span>
     </div>
     <div id="dailyAdCount" style="display:none;">Total Ads Sent Today: 0</div>
-    <div class="progress-bar" id="progressBar"></div>
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
     <div id="countryCount" style="display:none;"></div>
 
     <div id="output" class="text-container" style="display:none;" contenteditable="true">
@@ -569,6 +678,13 @@
             <li data-time="16:50">4:50-5:00 PM</li>
         </ul>
         <div class="reminder-note">(Select your slots to get reminder)</div>
+
+        <!-- Button Container -->
+        <div id="rightSidebar" style="display:none;">
+            <button class="fullscreen-button" onclick="toggleFullScreen()">Full Screen</button>
+            <button id="undoButton" style="display:none;" onclick="undoLastCut()">Undo Last Cut</button>
+            <button id="lockButton" onclick="toggleLock()">🔒 Lock</button>
+        </div>
     </div>
 
     <div id="reminderPopup" class="popup">
@@ -579,6 +695,11 @@
 
     <!-- Scroll Lock Notice -->
     <div id="scrollLockNotice" class="scroll-lock-notice">Scrolling is locked. Unlock to scroll.</div>
+
+    <!-- Credit Section -->
+    <div id="credit">
+        This Web-App is Developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>.
+    </div>
 
     <script>
         const countryList = [
@@ -601,7 +722,7 @@
             "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
             "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
             "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
-            "Vietnam", "Yemen", "Zambia", "Zimbabwe", "UK", "USA", "U.S.A.", "U. S. A.", "Korea", "UAE", "Hong Kong", "Ivory Coast", "Cote d'Ivoire", "Cote D'Ivoire", "Macau", "Macao", "Macedonia" 
+            "Vietnam", "Yemen", "Zambia", "Zimbabwe", "UK", "USA", "U.S.A.", "U. S. A.", "Korea", "UAE", "Hong Kong", "Ivory Coast", "Cote d'Ivoire"
         ];
 
         let currentUser = null;
@@ -609,6 +730,8 @@
         let cutHistory = [];
         let isLocked = false;
         let isProcessing = false;
+        let totalParagraphs = 0;
+        let cutCooldown = false; // To prevent accidental double cuts
 
         function clearMemory() {
             const password = prompt('Please enter the password to clear memory:');
@@ -632,7 +755,11 @@
                 localStorage.setItem(`savedIncomplete_${currentUser}`, incompleteText);
                 localStorage.setItem(`dailyAdCount_${currentUser}`, dailyAdCount);
                 localStorage.setItem(`lastCutTime_${currentUser}`, Date.now());
+                localStorage.setItem(`totalParagraphs_${currentUser}`, totalParagraphs);
                 saveSelectedReminders();
+                saveEffectPreferences();
+                saveOperationPreferences();
+                saveFontPreferences();
             }
         }
 
@@ -644,6 +771,9 @@
                 const savedIncomplete = localStorage.getItem(`savedIncomplete_${currentUser}`);
                 const savedDailyAdCount = localStorage.getItem(`dailyAdCount_${currentUser}`);
                 const lastCutTime = localStorage.getItem(`lastCutTime_${currentUser}`);
+                const savedTotalParagraphs = localStorage.getItem(`totalParagraphs_${currentUser}`);
+                const savedFontStyle = localStorage.getItem(`fontStyle_${currentUser}`);
+                const savedFontSize = localStorage.getItem(`fontSize_${currentUser}`);
                 if (savedInput) {
                     document.getElementById('inputText').value = savedInput;
                 }
@@ -663,9 +793,31 @@
                         dailyAdCount = parseInt(savedDailyAdCount, 10);
                     }
                 }
+                if (savedTotalParagraphs) {
+                    totalParagraphs = parseInt(savedTotalParagraphs, 10);
+                }
+                if (savedFontStyle) {
+                    document.getElementById('fontStyle').value = savedFontStyle;
+                }
+                if (savedFontSize) {
+                    document.getElementById('fontSize').value = savedFontSize;
+                }
+                loadEffectPreferences();
+                loadOperationPreferences();
                 loadSelectedReminders();
                 updateCounts();
+                updateFont();
+                document.getElementById('rightSidebar').style.display = 'block'; // Show buttons after login
                 document.getElementById('lockButton').style.display = 'inline-block';
+            }
+        }
+
+        function saveFontPreferences() {
+            const fontStyle = document.getElementById('fontStyle').value;
+            const fontSize = document.getElementById('fontSize').value;
+            if (currentUser) {
+                localStorage.setItem(`fontStyle_${currentUser}`, fontStyle);
+                localStorage.setItem(`fontSize_${currentUser}`, fontSize);
             }
         }
 
@@ -733,7 +885,7 @@
 
         function updateProgressBar(dailyAdCount) {
             const progressBar = document.getElementById('progressBar');
-            const maxCount = 1800;
+            const maxCount = 1200;
 
             const percentage = Math.min(dailyAdCount / maxCount, 1) * 100;
             progressBar.style.width = `${percentage}%`;
@@ -743,14 +895,17 @@
             progressBar.style.backgroundColor = `rgb(${red},${green},0)`;
         }
 
-        function updateRemainingTime() {
-        const adCount = document.getElementById('totalAds').innerText;
-        const remainingTimeInMinutes = adCount / 20; // Calculating based on total ads (20 ads/min)
-        const remainingTimeInSeconds = remainingTimeInMinutes * 60;
-        const hours = Math.floor(remainingTimeInSeconds / 3600);
-        const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
+        function updateRemainingTime(dailyAdCount) {
+            const remainingEntries = totalParagraphs - dailyAdCount;
+            const remainingTimeInMinutes = remainingEntries / 15;
+            const remainingTimeInSeconds = remainingTimeInMinutes * 60;
+            const hours = Math.floor(remainingTimeInSeconds / 3600);
+            const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
+
+            const percentageCompleted = Math.min((dailyAdCount / totalParagraphs) * 100, 100).toFixed(2);
 
             document.getElementById('remainingTimeText').innerText = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+            document.getElementById('completionPercentage').innerText = `${percentageCompleted}%`;
         }
 
         function processText() {
@@ -761,18 +916,18 @@
 
             const inputText = document.getElementById('inputText').value;
             const paragraphs = inputText.split(/\n\s*\n/);
+            totalParagraphs = paragraphs.length;
             const outputContainer = document.getElementById('output');
             const incompleteContainer = document.getElementById('incompleteText');
             outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
             incompleteContainer.value = '';
 
-            const lineGap = parseInt(document.getElementById('lineGap').value, 10);
             let index = 0;
             const nonRussiaEntries = [];
             const russiaEntries = [];
 
             function processChunk() {
-                const chunkSize = 5;
+                const chunkSize = 10;
                 const end = Math.min(index + chunkSize, paragraphs.length);
                 for (; index < end; index++) {
                     let paragraph = paragraphs[index].trim();
@@ -817,15 +972,31 @@
         }
 
         function cutParagraph(paragraph) {
+            if (cutCooldown) return; // Prevent double cut
+            cutCooldown = true;
+
             const textToCopy = paragraph.innerText;
             cutHistory.push(textToCopy);
 
-            const selection = window.getSelection();
-            const range = document.createRange();
-            range.selectNodeContents(paragraph);
-            selection.removeAllRanges();
-            selection.addRange(range);
+            const effectType = document.getElementById('effectType').value;
+            const effectsEnabled = document.getElementById('effectsToggle').checked;
 
+            if (effectsEnabled && effectType !== 'none') {
+                paragraph.classList.add(effectType);
+                paragraph.addEventListener('animationend', () => {
+                    copyAndRemoveParagraph(paragraph, textToCopy);
+                });
+            } else {
+                copyAndRemoveParagraph(paragraph, textToCopy);
+            }
+
+            // Reset the cooldown after a short delay
+            setTimeout(() => {
+                cutCooldown = false;
+            }, 500);
+        }
+
+        function copyAndRemoveParagraph(paragraph, textToCopy) {
             const tempTextarea = document.createElement('textarea');
             tempTextarea.style.position = 'fixed';
             tempTextarea.style.opacity = '0';
@@ -848,6 +1019,9 @@
             saveText();
 
             document.getElementById('undoButton').style.display = 'block';
+
+            // Keep the cursor in the same position for the next cut
+            document.getElementById('output').focus();
         }
 
         function undoLastCut() {
@@ -923,6 +1097,7 @@
             const fontSize = document.getElementById('fontSize').value;
             document.getElementById('output').style.fontFamily = fontStyle;
             document.getElementById('output').style.fontSize = `${fontSize}px`;
+            saveFontPreferences();
         }
 
         function toggleLock() {
@@ -932,6 +1107,7 @@
 
             if (isLocked) {
                 lockButton.innerHTML = '🔓 Unlock';
+                lockButton.classList.add('locked');
                 interactiveElements.forEach(element => {
                     if (element.id !== 'output' && element.id !== 'undoButton' && element.id !== 'lockButton') {
                         element.disabled = true;
@@ -940,6 +1116,7 @@
                 document.body.classList.add('scroll-locked');
             } else {
                 lockButton.innerHTML = '🔒 Lock';
+                lockButton.classList.remove('locked');
                 interactiveElements.forEach(element => {
                     if (element.id !== 'output' && element.id !== 'undoButton' && element.id !== 'lockButton') {
                         element.disabled = false;
@@ -1008,7 +1185,7 @@
         });
 
         document.querySelectorAll('input[name="cutOption"]').forEach(option => {
-            option.addEventListener('change', startMonitoring);
+            option.addEventListener('change', saveOperationPreferences);
         });
 
         function checkDailyReset() {
@@ -1186,22 +1363,37 @@
             }
         }, { passive: false });
 
-        // Move entries containing a specific keyword to the end of the container
-        function moveEntriesToEnd(keyword, container, isTextArea) {
-            if (isTextArea) {
-                const lines = container.value.trim().split("\n\n");
-                const filteredLines = lines.filter(line => line.includes(keyword));
-                const remainingLines = lines.filter(line => !line.includes(keyword));
+        function saveEffectPreferences() {
+            const effectsEnabled = document.getElementById('effectsToggle').checked;
+            const effectType = document.getElementById('effectType').value;
+            if (currentUser) {
+                localStorage.setItem(`effectsEnabled_${currentUser}`, effectsEnabled);
+                localStorage.setItem(`effectType_${currentUser}`, effectType);
+            }
+        }
 
-                container.value = [...remainingLines, ...filteredLines].join("\n\n");
-            } else {
-                const paragraphs = Array.from(container.querySelectorAll('p'));
-                const filteredParagraphs = paragraphs.filter(paragraph => paragraph.innerText.includes(keyword));
-                const remainingParagraphs = paragraphs.filter(paragraph => !paragraph.innerText.includes(keyword));
+        function loadEffectPreferences() {
+            const savedEffectsEnabled = localStorage.getItem(`effectsEnabled_${currentUser}`);
+            const savedEffectType = localStorage.getItem(`effectType_${currentUser}`);
+            if (savedEffectsEnabled) {
+                document.getElementById('effectsToggle').checked = savedEffectsEnabled === 'true';
+            }
+            if (savedEffectType) {
+                document.getElementById('effectType').value = savedEffectType;
+            }
+        }
 
-                container.innerHTML = '';
-                remainingParagraphs.forEach(paragraph => container.appendChild(paragraph));
-                filteredParagraphs.forEach(paragraph => container.appendChild(paragraph));
+        function saveOperationPreferences() {
+            const selectedOption = document.querySelector('input[name="cutOption"]:checked').value;
+            if (currentUser) {
+                localStorage.setItem(`operationMode_${currentUser}`, selectedOption);
+            }
+        }
+
+        function loadOperationPreferences() {
+            const savedOperationMode = localStorage.getItem(`operationMode_${currentUser}`);
+            if (savedOperationMode) {
+                document.querySelector(`input[name="cutOption"][value="${savedOperationMode}"]`).checked = true;
             }
         }
     </script>
