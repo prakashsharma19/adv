@@ -198,7 +198,7 @@
 
         .rough-container {
             width: 30%;
-            margin-left: 2%;
+            margin-left: 0%;
         }
 
         .input-boxes {
@@ -206,10 +206,20 @@
         }
 
         #okButton {
-            align-self: flex-end;
-            margin-top: 10px;
-            background-color: #1171ba;
-        }
+    align-self: flex-end;
+    background-color: #28a745; /* Green color */
+    border: none;
+    color: white;
+    padding: 10px 20px; /* Smaller padding */
+    font-size: 14px; /* Smaller font size */
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+#okButton:hover {
+    background-color: #218838; /* Darker green for hover effect */
+}
 
         #adCount,
         #dailyAdCount,
@@ -514,6 +524,10 @@
             animation: explode 0.3s forwards;
         }
 
+        .highlight-added {
+            background-color: #f4e542;
+        }
+
         /* Credit Section */
         #credit {
             position: fixed;
@@ -540,6 +554,14 @@
             gap: 10px;
             align-items: flex-end;
             z-index: 999;
+        }
+
+        /* Options in the font control pane */
+        .gap-control {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -609,6 +631,14 @@
                 <label for="fontSize">Size:</label>
                 <input type="number" id="fontSize" value="16" onchange="updateFont()">px
             </div>
+
+            <div class="gap-control">
+                <label for="gapOption">Gap:</label>
+                <select id="gapOption" onchange="saveGapPreferences()">
+                    <option value="default">Default</option>
+                    <option value="nil">Nil</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -619,7 +649,7 @@
         </div>
         <div id="pasteBox" class="input-boxes">
             <textarea id="inputText" rows="5" placeholder="Paste your text here..."></textarea>
-            <button id="okButton" onclick="processText()">OK</button>
+            <button id="okButton" onclick="processText()">Process</button>
         </div>
     </div>
 
@@ -653,7 +683,7 @@
 
     <div id="adCount" style="display:none;">
         Total Advertisements: <span id="totalAds">0</span>
-        <span id="loadingIndicator">Loading, please wait...</span>
+        <span id="loadingIndicator">Processing, please wait...</span>
     </div>
     <div id="dailyAdCount" style="display:none;">Total Ads Sent Today: 0</div>
     <div class="progress-bar-container">
@@ -698,7 +728,7 @@
 
     <!-- Credit Section -->
     <div id="credit">
-        This Web-App is Developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>.
+        This Web-App is Developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
     </div>
 
     <script>
@@ -731,7 +761,7 @@
         let isLocked = false;
         let isProcessing = false;
         let totalParagraphs = 0;
-        let cutCooldown = false; // To prevent accidental double cuts
+        let cutCooldown = false;
 
         function clearMemory() {
             const password = prompt('Please enter the password to clear memory:');
@@ -760,6 +790,7 @@
                 saveEffectPreferences();
                 saveOperationPreferences();
                 saveFontPreferences();
+                saveGapPreferences();
             }
         }
 
@@ -774,6 +805,7 @@
                 const savedTotalParagraphs = localStorage.getItem(`totalParagraphs_${currentUser}`);
                 const savedFontStyle = localStorage.getItem(`fontStyle_${currentUser}`);
                 const savedFontSize = localStorage.getItem(`fontSize_${currentUser}`);
+                const savedGapOption = localStorage.getItem(`gapOption_${currentUser}`);
                 if (savedInput) {
                     document.getElementById('inputText').value = savedInput;
                 }
@@ -802,12 +834,15 @@
                 if (savedFontSize) {
                     document.getElementById('fontSize').value = savedFontSize;
                 }
+                if (savedGapOption) {
+                    document.getElementById('gapOption').value = savedGapOption;
+                }
                 loadEffectPreferences();
                 loadOperationPreferences();
                 loadSelectedReminders();
                 updateCounts();
                 updateFont();
-                document.getElementById('rightSidebar').style.display = 'block'; // Show buttons after login
+                document.getElementById('rightSidebar').style.display = 'block';
                 document.getElementById('lockButton').style.display = 'inline-block';
             }
         }
@@ -897,7 +932,7 @@
 
         function updateRemainingTime(dailyAdCount) {
             const remainingEntries = totalParagraphs - dailyAdCount;
-            const remainingTimeInMinutes = remainingEntries / 15;
+            const remainingTimeInMinutes = remainingEntries / 40;
             const remainingTimeInSeconds = remainingTimeInMinutes * 60;
             const hours = Math.floor(remainingTimeInSeconds / 3600);
             const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
@@ -926,6 +961,8 @@
             const nonRussiaEntries = [];
             const russiaEntries = [];
 
+            const gapOption = document.getElementById('gapOption').value;
+
             function processChunk() {
                 const chunkSize = 10;
                 const end = Math.min(index + chunkSize, paragraphs.length);
@@ -933,19 +970,30 @@
                     let paragraph = paragraphs[index].trim();
                     if (paragraph !== '') {
                         const lines = paragraph.split('\n');
-                        const firstLine = lines[0].trim();
-                        const lastName = firstLine.split(' ').pop();
+                        let firstLine = lines[0].trim();
+                        let lastName = firstLine.split(' ').pop();
 
-                        const greeting = `\n\nDear Professor ${lastName},\n`;
+                        if (!firstLine.toLowerCase().startsWith('professor')) {
+                            // Add "Professor" if it's missing, and highlight it in yellow
+                            firstLine = `<span class="highlight-added">Professor</span> ${firstLine}`;
+                            lines[0] = firstLine;
+                        }
 
-                        const highlightedText = highlightErrors(paragraph.replace(/\n/g, '<br>'));
+                        const processedParagraph = lines.join('\n');
+                        const greeting = `Dear Professor ${lastName},\n`;
+
+                        // Check the gap option and apply it appropriately
+                        const fullText = gapOption === 'nil' ?
+                            processedParagraph + '\n' + greeting : processedParagraph + '\n\n' + greeting;
+
+                        const highlightedText = highlightErrors(fullText.replace(/\n/g, '<br>'));
                         const hasError = highlightedText.includes('error');
 
                         if (hasError) {
                             incompleteContainer.value += `${highlightedText.replace(/<br>/g, '\n').replace(/<[^>]+>/g, '')}\n\n`;
                         } else {
                             const p = document.createElement('p');
-                            p.innerHTML = highlightedText + greeting;
+                            p.innerHTML = highlightedText;
 
                             if (paragraph.includes('Russia')) {
                                 russiaEntries.push(p);
@@ -972,7 +1020,7 @@
         }
 
         function cutParagraph(paragraph) {
-            if (cutCooldown) return; // Prevent double cut
+            if (cutCooldown) return;
             cutCooldown = true;
 
             const textToCopy = paragraph.innerText;
@@ -990,7 +1038,6 @@
                 copyAndRemoveParagraph(paragraph, textToCopy);
             }
 
-            // Reset the cooldown after a short delay
             setTimeout(() => {
                 cutCooldown = false;
             }, 500);
@@ -1020,7 +1067,6 @@
 
             document.getElementById('undoButton').style.display = 'block';
 
-            // Keep the cursor in the same position for the next cut
             document.getElementById('output').focus();
         }
 
@@ -1098,6 +1144,13 @@
             document.getElementById('output').style.fontFamily = fontStyle;
             document.getElementById('output').style.fontSize = `${fontSize}px`;
             saveFontPreferences();
+        }
+
+        function saveGapPreferences() {
+            const gapOption = document.getElementById('gapOption').value;
+            if (currentUser) {
+                localStorage.setItem(`gapOption_${currentUser}`, gapOption);
+            }
         }
 
         function toggleLock() {
