@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advertisements-PPH</title>
     <style>
-        body {
+body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
             background-color: #f4f4f4;
             padding: 20px;
@@ -590,7 +590,7 @@
 
     <div class="font-controls" style="display:none;">
         <div class="control-group">
-            <div>
+<div>
                 <label>
                     <input type="radio" name="cutOption" value="keyboard" checked>
                     Keyboard
@@ -641,6 +641,19 @@
             </div>
         </div>
     </div>
+            <div>
+                <label>
+                    <input type="radio" name="toOption" value="withTo"> With "To"
+                </label>
+                <label>
+                    <input type="radio" name="toOption" value="withoutTo" checked> Without "To"
+                </label>
+            </div>
+			<div style="display: flex; align-items: center;">
+    <input type="email" id="unsubscribedEmail" placeholder="Enter unsubscribed email" style="margin-left: 20px;">
+    <button onclick="deleteUnsubscribedEntries()" style="margin-left: 10px;">Delete Unsubscribed Address</button>
+	<button onclick="exportUnsubscribedEmails()" style="margin-left: 10px;">Export Unsubscribed Emails</button>
+</div>
 
     <div class="input-container" style="display:none;">
         <div class="container-header" onclick="toggleBox('pasteBox')">
@@ -695,7 +708,7 @@
         <p id="cursorStart">Place your cursor here</p>
     </div>
 
-    <div class="right-content">
+<div class="right-content">
         <div id="currentTime"></div>
         <div class="reminder-heading">Ad Slots:</div>
         <ul class="reminder-slots">
@@ -713,7 +726,7 @@
         <div id="rightSidebar" style="display:none;">
             <button class="fullscreen-button" onclick="toggleFullScreen()">Full Screen</button>
             <button id="undoButton" style="display:none;" onclick="undoLastCut()">Undo Last Cut</button>
-            <button id="lockButton" onclick="toggleLock()">🔒 Lock</button>
+            <button id="lockButton" onclick="toggleLock()">Lock</button>
         </div>
     </div>
 
@@ -730,7 +743,7 @@
     <div id="credit">
         This Web-App is Developed by <a href="https://prakashsharma19.github.io/prakash/" target="_blank">Prakash</a>
     </div>
-
+	
     <script>
         const countryList = [
             "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
@@ -755,6 +768,82 @@
             "Vietnam", "Yemen", "Zambia", "Zimbabwe", "UK", "USA", "U.S.A.", "U. S. A.", "Korea", "UAE", "Hong Kong", "Ivory Coast", "Cote d'Ivoire", "Macau", "Macao", "Macedonia"
         ];
 
+// Google Sheets Configuration
+const SHEET_ID = '1aE0eQZ9CujJcIHFIFyn2hSBnCLUiN7sJNIOSymnDdsg';
+const API_KEY = 'AIzaSyAhSu2NruzWILHwK9PGv4-yXnUHkUjVQDo';
+const SHEET_NAME = 'Unsubscribed Emails';  // Ensure this matches the sheet name in Google Sheets
+
+// Fetch unsubscribed emails from Google Sheets and save to local storage
+// Helper to fetch unsubscribed emails from localStorage or Google Sheets on load
+async function fetchUnsubscribedEmails() {
+    const storedEmails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
+    // Fetch from Google Sheets on load
+    const googleEmails = await fetchEmailsFromGoogleSheet();
+    const allEmails = [...new Set([...storedEmails, ...googleEmails])]; // Combine and de-duplicate
+    localStorage.setItem('permanentUnsubscribedEmails', JSON.stringify(allEmails));
+    processText();
+}
+
+// Fetch from Google Sheets only (used in fetchUnsubscribedEmails)
+async function fetchEmailsFromGoogleSheet() {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!A2:A?key=${API_KEY}`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data.values ? data.values.flat().map(email => email.toLowerCase()) : [];
+    } catch (error) {
+        console.error('Error fetching unsubscribed emails from Google Sheets:', error);
+        return [];
+    }
+}
+
+// Add new unsubscribed email to local storage (on change event)
+document.getElementById('unsubscribedEmail').addEventListener('change', function() {
+    const newEmail = this.value.trim().toLowerCase();
+    if (newEmail) {
+        addUnsubscribedEmail(newEmail);
+        this.value = ''; // Clear input box after storing
+        processText(); // Re-process text to apply highlighting
+    }
+});
+
+// Store new unsubscribed email locally
+function addUnsubscribedEmail(email) {
+    const emails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
+    if (!emails.includes(email)) {
+        emails.push(email);
+        localStorage.setItem('permanentUnsubscribedEmails', JSON.stringify(emails));
+    }
+}
+
+// Highlight unsubscribed emails
+function highlightUnsubscribed(text) {
+    const unsubscribedEmails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
+    unsubscribedEmails.forEach(email => {
+        const emailRegex = new RegExp(`(${email})`, 'gi');
+        text = text.replace(emailRegex, '<span class="highlight-unsubscribed">$1</span>');
+    });
+    return text;
+}
+
+// Load unsubscribed emails when the page loads
+document.addEventListener('DOMContentLoaded', fetchUnsubscribedEmails);
+
+// Delete paragraphs containing unsubscribed emails
+function deleteUnsubscribedEntries() {
+    const outputContainer = document.getElementById('output');
+    const paragraphs = outputContainer.querySelectorAll('p');
+    const unsubscribedEmails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
+
+    paragraphs.forEach(paragraph => {
+        unsubscribedEmails.forEach(email => {
+            if (paragraph.innerHTML.includes(email)) {
+                paragraph.remove();
+            }
+        });
+    });
+    saveText();
+}
         let currentUser = null;
         let dailyAdCount = 0;
         let cutHistory = [];
@@ -944,80 +1033,84 @@
         }
 
         function processText() {
-            if (isProcessing) return;
+    if (isProcessing) return;
 
-            isProcessing = true;
-            document.getElementById('loadingIndicator').style.display = 'inline';
+    isProcessing = true;
+    document.getElementById('loadingIndicator').style.display = 'inline';
 
-            const inputText = document.getElementById('inputText').value;
-            const paragraphs = inputText.split(/\n\s*\n/);
-            totalParagraphs = paragraphs.length;
-            const outputContainer = document.getElementById('output');
-            const incompleteContainer = document.getElementById('incompleteText');
-            outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
-            incompleteContainer.value = '';
+    const inputText = document.getElementById('inputText').value;
+    const paragraphs = inputText.split(/\n\s*\n/);
+    totalParagraphs = paragraphs.length;
+    const outputContainer = document.getElementById('output');
+    const incompleteContainer = document.getElementById('incompleteText');
+    outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
+    incompleteContainer.value = '';
 
-            let index = 0;
-            const nonRussiaEntries = [];
-            const russiaEntries = [];
+    let index = 0;
+    const nonRussiaEntries = [];
+    const russiaEntries = [];
 
-            const gapOption = document.getElementById('gapOption').value;
+    const gapOption = document.getElementById('gapOption').value;
+    const toOption = document.querySelector('input[name="toOption"]:checked').value;
 
-            function processChunk() {
-                const chunkSize = 10;
-                const end = Math.min(index + chunkSize, paragraphs.length);
-                for (; index < end; index++) {
-                    let paragraph = paragraphs[index].trim();
-                    if (paragraph !== '') {
-                        const lines = paragraph.split('\n');
-                        let firstLine = lines[0].trim();
-                        let lastName = firstLine.split(' ').pop();
+    function processChunk() {
+        const chunkSize = 10;
+        const end = Math.min(index + chunkSize, paragraphs.length);
+        for (; index < end; index++) {
+            let paragraph = paragraphs[index].trim();
+            if (paragraph !== '') {
+                const lines = paragraph.split('\n');
+                let firstLine = lines[0].trim();
+                let lastName = firstLine.split(' ').pop();
 
-                        if (!firstLine.toLowerCase().startsWith('professor')) {
-                            // Add "Professor" if it's missing, and highlight it in yellow
-                            firstLine = `<span class="highlight-added">Professor</span> ${firstLine}`;
-                            lines[0] = firstLine;
-                        }
+                if (!firstLine.toLowerCase().startsWith('professor')) {
+                    firstLine = `<span class="highlight-added">Professor</span> ${firstLine}`;
+                    lines[0] = firstLine;
+                }
 
-                        const processedParagraph = lines.join('\n');
-                        const greeting = `Dear Professor ${lastName},\n`;
+                let processedParagraph = lines.join('\n');
+                if (toOption === 'withTo') {
+                    processedParagraph = `To\n${processedParagraph}`;
+                }
 
-                        // Check the gap option and apply it appropriately
-                        const fullText = gapOption === 'nil' ?
-                            processedParagraph + '\n' + greeting : processedParagraph + '\n\n' + greeting;
+                const greeting = `Dear Professor ${lastName},\n`;
+                let fullText = gapOption === 'nil' ?
+                    processedParagraph + '\n' + greeting : processedParagraph + '\n\n' + greeting;
 
-                        const highlightedText = highlightErrors(fullText.replace(/\n/g, '<br>'));
-                        const hasError = highlightedText.includes('error');
+                fullText = highlightUnsubscribed(fullText); // Highlight unsubscribed emails
+                const highlightedText = highlightErrors(fullText.replace(/\n/g, '<br>'));
+                const hasError = highlightedText.includes('error');
 
-                        if (hasError) {
-                            incompleteContainer.value += `${highlightedText.replace(/<br>/g, '\n').replace(/<[^>]+>/g, '')}\n\n`;
-                        } else {
-                            const p = document.createElement('p');
-                            p.innerHTML = highlightedText;
+                if (hasError) {
+                    incompleteContainer.value += `${highlightedText.replace(/<br>/g, '\n').replace(/<[^>]+>/g, '')}\n\n`;
+                } else {
+                    const p = document.createElement('p');
+                    p.innerHTML = highlightedText;
 
-                            if (paragraph.includes('Russia')) {
-                                russiaEntries.push(p);
-                            } else {
-                                nonRussiaEntries.push(p);
-                            }
-                        }
+                    if (paragraph.includes('Russia')) {
+                        russiaEntries.push(p);
+                    } else {
+                        nonRussiaEntries.push(p);
                     }
                 }
-                if (index < paragraphs.length) {
-                    requestAnimationFrame(processChunk);
-                } else {
-                    nonRussiaEntries.forEach(entry => outputContainer.appendChild(entry));
-                    russiaEntries.forEach(entry => outputContainer.appendChild(entry));
-
-                    updateCounts();
-                    saveText();
-                    document.getElementById('lockButton').style.display = 'inline-block';
-                    document.getElementById('loadingIndicator').style.display = 'none';
-                    isProcessing = false;
-                }
             }
-            requestAnimationFrame(processChunk);
         }
+        if (index < paragraphs.length) {
+            requestAnimationFrame(processChunk);
+        } else {
+            nonRussiaEntries.forEach(entry => outputContainer.appendChild(entry));
+            russiaEntries.forEach(entry => outputContainer.appendChild(entry));
+
+            updateCounts();
+            saveText();
+            document.getElementById('lockButton').style.display = 'inline-block';
+            document.getElementById('loadingIndicator').style.display = 'none';
+            isProcessing = false;
+        }
+    }
+    requestAnimationFrame(processChunk);
+}
+
 
         function cutParagraph(paragraph) {
             if (cutCooldown) return;
@@ -1159,7 +1252,7 @@
             isLocked = !isLocked;
 
             if (isLocked) {
-                lockButton.innerHTML = '🔓 Unlock';
+                lockButton.innerHTML = 'Unlock';
                 lockButton.classList.add('locked');
                 interactiveElements.forEach(element => {
                     if (element.id !== 'output' && element.id !== 'undoButton' && element.id !== 'lockButton') {
@@ -1168,7 +1261,7 @@
                 });
                 document.body.classList.add('scroll-locked');
             } else {
-                lockButton.innerHTML = '🔒 Lock';
+                lockButton.innerHTML = 'Lock';
                 lockButton.classList.remove('locked');
                 interactiveElements.forEach(element => {
                     if (element.id !== 'output' && element.id !== 'undoButton' && element.id !== 'lockButton') {
@@ -1332,7 +1425,7 @@
         function blinkTab() {
             let isOriginalTitle = true;
             blinkInterval = setInterval(() => {
-                document.title = isOriginalTitle ? '🔔 Reminder: Send Ads!' : originalTitle;
+                document.title = isOriginalTitle ? '?? Reminder: Send Ads!' : originalTitle;
                 isOriginalTitle = !isOriginalTitle;
             }, 1000);
         }
@@ -1448,7 +1541,38 @@
             if (savedOperationMode) {
                 document.querySelector(`input[name="cutOption"][value="${savedOperationMode}"]`).checked = true;
             }
+        // Function to export unsubscribed emails from localStorage as a JSON file
+function exportUnsubscribedEmails() {
+    const emails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(emails));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "unsubscribed_emails.json");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    document.body.removeChild(downloadAnchor);
+}
+// Function to sync email with Google Sheets using the Google Apps Script web app
+function syncEmailWithGoogleSheets(email) {
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbz3yehn7Fc6bDqqcEVptxwrUtl9XzFeAYM1iEte_4MBxZMPFI2D0vPfSYuMjkVb2iJg/exec'; // Replace with the URL from the deployment step
+
+    fetch(webAppUrl, {
+        method: 'POST',
+        body: JSON.stringify({ email: email }),
+        headers: {
+            'Content-Type': 'application/json'
         }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Email synced with Google Sheets:", data);
+    })
+    .catch(error => {
+        console.error("Error syncing email:", error);
+    });
+}
+
+		}
     </script>
 </body>
 
