@@ -769,8 +769,8 @@ body {
         ];
 
 // Google Sheets Configuration
-const SHEET_ID = '1aE0eQZ9CujJcIHFIFyn2hSBnCLUiN7sJNIOSymnDdsg';
-const API_KEY = 'AIzaSyAhSu2NruzWILHwK9PGv4-yXnUHkUjVQDo';
+const SHEET_ID = 'SHEET-ID';
+const API_KEY = 'Enter-API';
 const SHEET_NAME = 'Unsubscribed Emails';  // Ensure this matches the sheet name in Google Sheets
 
 // Fetch unsubscribed emails from Google Sheets and save to local storage
