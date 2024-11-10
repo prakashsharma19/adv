@@ -651,8 +651,18 @@ body {
             </div>
 			<div style="display: flex; align-items: center;">
     <input type="email" id="unsubscribedEmail" placeholder="Enter unsubscribed email" style="margin-left: 20px;">
-    <button onclick="deleteUnsubscribedEntries()" style="margin-left: 10px;">Delete Unsubscribed Address</button>
-	<button onclick="exportUnsubscribedEmails()" style="margin-left: 10px;">Export Unsubscribed Emails</button>
+    
+    <button onclick="exportUnsubscribedEmails()" style="margin-left: 10px; background-color: lightblue; cursor: pointer;">
+        Export Unsubscribed Emails
+    </button>
+    
+    <button onclick="deleteUnsubscribedEntries()" style="margin-left: 10px; background-color: lightblue; cursor: pointer;">
+        Delete Unsubscribed Address
+    </button>
+
+    <button onclick="window.open('https://docs.google.com/document/d/14AIqhs3wQ_T0hV7YNH2ToBRBH1MEkzmunw2e9WNgeo8/edit?tab=t.0', '_blank')" style="margin-left: 10px; background-color: lightblue; cursor: pointer;">
+        Email List
+    </button>
 </div>
 
     <div class="input-container" style="display:none;">
