@@ -649,21 +649,26 @@ body {
                     <input type="radio" name="toOption" value="withoutTo" checked> Without "To"
                 </label>
             </div>
-			<div style="display: flex; align-items: center;">
-    <input type="email" id="unsubscribedEmail" placeholder="Enter unsubscribed email" style="margin-left: 20px;">
+			<div style="display: flex; align-items: center; margin-bottom: 20px;">
+    <input type="email" id="unsubscribedEmail" placeholder="Enter Unsubscribed Email" style="margin-left: 20px;">
     
-    <button onclick="exportUnsubscribedEmails()" style="margin-left: 10px; background-color: lightblue; cursor: pointer;">
-        Export Unsubscribed Emails
+    <button onclick="exportUnsubscribedEmails()" 
+            id="exportButton" 
+            style="margin-left: 10px; background-color: #1171BA; color: white; border: none; cursor: pointer;">
+        Save
     </button>
     
-    <button onclick="deleteUnsubscribedEntries()" style="margin-left: 10px; background-color: lightblue; cursor: pointer;">
+    <button onclick="deleteUnsubscribedEntries()" 
+            style="margin-left: 10px; background-color: #1171BA; color: white; border: none; cursor: pointer;">
         Delete Unsubscribed Address
     </button>
-
-    <button onclick="window.open('https://docs.google.com/document/d/14AIqhs3wQ_T0hV7YNH2ToBRBH1MEkzmunw2e9WNgeo8/edit?tab=t.0', '_blank')" style="margin-left: 10px; background-color: lightblue; cursor: pointer;">
+    
+    <button onclick="window.open('https://docs.google.com/document/d/14AIqhs3wQ_T0hV7YNH2ToBRBH1MEkzmunw2e9WNgeo8/edit?tab=t.0', '_blank')" 
+            style="margin-left: 10px; background-color: #1171BA; color: white; border: none; cursor: pointer;">
         Email List
     </button>
 </div>
+<div id="successMessage" style="color: green; font-weight: bold; margin-top: 10px;"></div>
 
     <div class="input-container" style="display:none;">
         <div class="container-header" onclick="toggleBox('pasteBox')">
@@ -741,7 +746,7 @@ body {
     </div>
 
     <div id="reminderPopup" class="popup">
-        <span style="font-size: 50px;">🔔</span>
+        <span style="font-size: 50px;">??</span>
         <p>Send Ads</p>
         <button onclick="dismissPopup()">OK</button>
     </div>
@@ -777,6 +782,15 @@ body {
             "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
             "Vietnam", "Yemen", "Zambia", "Zimbabwe", "UK", "USA", "U.S.A.", "U. S. A.", "Korea", "UAE", "Hong Kong", "Ivory Coast", "Cote d'Ivoire", "Macau", "Macao", "Macedonia"
         ];
+	function showSuccessMessage(message) {
+    const successMessage = document.getElementById('successMessage');
+    successMessage.innerText = message;
+    successMessage.style.display = 'block';
+
+    setTimeout(() => {
+        successMessage.style.display = 'none';
+    }, 3000); // Hide the message after 3 seconds
+}
 
 // Google Sheets Configuration
 const SHEET_ID = 'SHEET-ID';
@@ -844,16 +858,21 @@ function deleteUnsubscribedEntries() {
     const outputContainer = document.getElementById('output');
     const paragraphs = outputContainer.querySelectorAll('p');
     const unsubscribedEmails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
+    let deletedCount = 0;
 
     paragraphs.forEach(paragraph => {
         unsubscribedEmails.forEach(email => {
             if (paragraph.innerHTML.includes(email)) {
                 paragraph.remove();
+                deletedCount++;
             }
         });
     });
+
     saveText();
+    showSuccessMessage(`Successfully Deleted ${deletedCount} addresses.`);
 }
+
         let currentUser = null;
         let dailyAdCount = 0;
         let cutHistory = [];
@@ -991,18 +1010,20 @@ function deleteUnsubscribedEntries() {
         }
 
         function updateCounts() {
-            const outputContainer = document.getElementById('output');
-            const paragraphs = outputContainer.querySelectorAll('p');
-            let adCount = 0;
+    const outputContainer = document.getElementById('output');
+    const paragraphs = outputContainer.querySelectorAll('p');
+    let adCount = 0;
 
-            paragraphs.forEach(paragraph => {
-                if (paragraph.innerText.split('\n')[0].startsWith('Professor')) {
-                    adCount += 1;
-                }
-            });
+    // Increment count based on the start of each paragraph ("To" or "Professor")
+    paragraphs.forEach(paragraph => {
+        const firstLine = paragraph.innerText.split('\n')[0];
+        if (firstLine.startsWith('To') || firstLine.startsWith('Professor')) {
+            adCount += 1;
+        }
+    });
 
-            document.getElementById('totalAds').innerText = adCount;
-            document.getElementById('dailyAdCount').innerText = `Total Ads Today: ${dailyAdCount}`;
+    document.getElementById('totalAds').innerText = adCount;
+    document.getElementById('dailyAdCount').innerText = `Total Ads Today: ${dailyAdCount}`;
 
             const text = outputContainer.innerText;
             const countryCounts = countCountryOccurrences(text);
@@ -1123,56 +1144,67 @@ function deleteUnsubscribedEntries() {
 
 
         function cutParagraph(paragraph) {
-            if (cutCooldown) return;
-            cutCooldown = true;
+    if (cutCooldown) return;
+    cutCooldown = true;
 
-            const textToCopy = paragraph.innerText;
-            cutHistory.push(textToCopy);
+    const textToCopy = paragraph.innerText;
+    cutHistory.push(textToCopy);
 
-            const effectType = document.getElementById('effectType').value;
-            const effectsEnabled = document.getElementById('effectsToggle').checked;
+    const effectType = document.getElementById('effectType').value;
+    const effectsEnabled = document.getElementById('effectsToggle').checked;
+    
+    // Check the 'toOption' selection to determine prefix handling
+    const toOption = document.querySelector('input[name="toOption"]:checked').value;
 
-            if (effectsEnabled && effectType !== 'none') {
-                paragraph.classList.add(effectType);
-                paragraph.addEventListener('animationend', () => {
-                    copyAndRemoveParagraph(paragraph, textToCopy);
-                });
-            } else {
-                copyAndRemoveParagraph(paragraph, textToCopy);
-            }
+    // Check and remove 'To\n' if 'With "To"' is selected
+    let textToProcess = textToCopy;
+    if (toOption === 'withTo' && textToCopy.startsWith("To\n")) {
+        textToProcess = textToCopy.replace(/^To\n/, '');  // Remove "To\n" prefix if present
+    }
 
-            setTimeout(() => {
-                cutCooldown = false;
-            }, 500);
-        }
+    if (effectsEnabled && effectType !== 'none') {
+        paragraph.classList.add(effectType);
+        paragraph.addEventListener('animationend', () => {
+            copyAndRemoveParagraph(paragraph, textToProcess);
+        });
+    } else {
+        copyAndRemoveParagraph(paragraph, textToProcess);
+    }
 
-        function copyAndRemoveParagraph(paragraph, textToCopy) {
-            const tempTextarea = document.createElement('textarea');
-            tempTextarea.style.position = 'fixed';
-            tempTextarea.style.opacity = '0';
-            tempTextarea.value = textToCopy;
-            document.body.appendChild(tempTextarea);
-            tempTextarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextarea);
+    setTimeout(() => {
+        cutCooldown = false;
+    }, 500);
+}
 
-            paragraph.remove();
-            cleanupSpaces();
 
-            const inputText = document.getElementById('inputText').value;
-            const remainingText = inputText.replace(textToCopy.split('\nDear Professor')[0], '').trim();
-            document.getElementById('inputText').value = remainingText;
+function copyAndRemoveParagraph(paragraph, textToCopy, targetElementId) {
+  const tempTextarea = document.createElement('textarea');
+  tempTextarea.style.position = 'fixed';
+  tempTextarea.style.opacity = '0';
+  tempTextarea.value   
+ = textToCopy;
+  document.body.appendChild(tempTextarea);
+  tempTextarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(tempTextarea);   
 
-            dailyAdCount++;
 
-            updateCounts();
-            saveText();
+  paragraph.remove();
+  cleanupSpaces();
 
-            document.getElementById('undoButton').style.display = 'block';
+  const inputText = document.getElementById('inputText').value;
+  const remainingText = inputText.replace(textToCopy.split('\nDear Professor')[0], '').trim();
+  document.getElementById('inputText').value = remainingText;
 
-            document.getElementById('output').focus();
-        }
+  dailyAdCount++;
 
+  updateCounts();
+  saveText();
+
+  document.getElementById('undoButton').style.display = 'block';
+
+  document.getElementById('output').focus();
+  }
         function undoLastCut() {
             if (cutHistory.length > 0) {
                 const lastCutText = cutHistory.pop();
@@ -1553,11 +1585,31 @@ function deleteUnsubscribedEntries() {
             }
         // Function to export unsubscribed emails from localStorage as a JSON file
 function exportUnsubscribedEmails() {
+    console.log("Export button clicked");  // Debugging: Check if function is called
+
     const emails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(emails));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
     downloadAnchor.setAttribute("download", "unsubscribed_emails.json");
+
+    // Get the export button and temporarily change its color and text
+    const exportButton = document.getElementById('exportButton');
+    if (exportButton) {
+        console.log("Export button found");  // Debugging: Verify the button element was found
+        exportButton.style.backgroundColor = 'green';
+        exportButton.innerText = 'Saved';
+
+        // Revert button color and text after 1 second
+        setTimeout(() => {
+            exportButton.style.backgroundColor = '#1171BA'; // Original color
+            exportButton.innerText = 'Export Unsubscribed Emails'; // Original text
+        }, 1000);
+    } else {
+        console.error("Export button not found");  // Error if the button ID is incorrect
+    }
+
+    // Trigger download
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     document.body.removeChild(downloadAnchor);
