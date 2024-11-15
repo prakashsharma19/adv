@@ -1052,7 +1052,7 @@ function deleteUnsubscribedEntries() {
 
         function updateRemainingTime(dailyAdCount) {
             const remainingEntries = totalParagraphs - dailyAdCount;
-            const remainingTimeInMinutes = remainingEntries / 35;
+            const remainingTimeInMinutes = remainingEntries / 25;
             const remainingTimeInSeconds = remainingTimeInMinutes * 60;
             const hours = Math.floor(remainingTimeInSeconds / 3600);
             const minutes = Math.floor((remainingTimeInSeconds % 3600) / 60);
