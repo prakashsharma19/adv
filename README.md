@@ -664,7 +664,7 @@ body {
     </button>
     
     <button onclick="window.open('https://docs.google.com/document/d/14AIqhs3wQ_T0hV7YNH2ToBRBH1MEkzmunw2e9WNgeo8/edit?tab=t.0', '_blank')" 
-            style="margin-left: 10px; background-color: #1171BA; color: white; border: none; cursor: pointer;">
+            style="margin-left: 10px; background-color: #0B6623; color: white; border: none; cursor: pointer;">
         Email List
     </button>
 </div>
