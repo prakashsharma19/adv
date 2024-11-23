@@ -641,7 +641,15 @@ body {
             </div>
         </div>
     </div>
-            			<div style="display: flex; align-items: center; margin-bottom: 15px;">
+            <div>
+                <label>
+                    <input type="radio" name="toOption" value="withTo"> With "To"
+                </label>
+                <label>
+                    <input type="radio" name="toOption" value="withoutTo" checked> Without "To"
+                </label>
+            </div>
+			<div style="display: flex; align-items: center; margin-bottom: 20px;">
     <input type="email" id="unsubscribedEmail" placeholder="Enter Unsubscribed Email" style="margin-left: 20px;">
     
     <button onclick="exportUnsubscribedEmails()" 
@@ -882,108 +890,7 @@ function deleteUnsubscribedEntries() {
                 alert('Incorrect password. Memory not cleared.');
             }
         }
-function deleteUnsubscribedEntries() {
-    const outputContainer = document.getElementById('output');
-    const paragraphs = outputContainer.querySelectorAll('p');
-    const unsubscribedEmails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
-    const deletedEmails = [];
 
-    paragraphs.forEach(paragraph => {
-        unsubscribedEmails.forEach(email => {
-            if (paragraph.innerHTML.includes(email)) {
-                paragraph.remove();
-                deletedEmails.push(email);
-            }
-        });
-    });
-
-    if (deletedEmails.length > 0) {
-        displayDeletedAddressesPopup(deletedEmails);
-    }
-
-    saveText();
-    showSuccessMessage(`Successfully Deleted ${deletedEmails.length} addresses.`);
-}
-
-// Function to display popup for deleted addresses
-function displayDeletedAddressesPopup(deletedEmails) {
-    let currentIndex = 0;
-
-    const popup = document.createElement('div');
-    popup.style.cssText = `
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: #2c3e50;
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        z-index: 1000;
-        text-align: center;
-    `;
-
-    const message = document.createElement('div');
-    message.style.fontSize = '18px';
-    message.innerText = `Deleted Address: ${deletedEmails[currentIndex]}`;
-
-    const navigation = document.createElement('div');
-    navigation.style.margin = '10px 0';
-
-    const prevButton = document.createElement('button');
-    prevButton.innerText = '<';
-    prevButton.disabled = currentIndex === 0;
-    prevButton.style.marginRight = '10px';
-
-    const nextButton = document.createElement('button');
-    nextButton.innerText = '>';
-    nextButton.disabled = currentIndex === deletedEmails.length - 1;
-
-    navigation.appendChild(prevButton);
-    navigation.appendChild(nextButton);
-
-    const okButton = document.createElement('button');
-    okButton.innerText = 'OK';
-    okButton.style.marginTop = '10px';
-    okButton.style.backgroundColor = '#28a745';
-    okButton.style.color = 'white';
-    okButton.style.border = 'none';
-    okButton.style.padding = '10px 20px';
-    okButton.style.cursor = 'pointer';
-    okButton.style.borderRadius = '5px';
-
-    okButton.addEventListener('click', () => {
-        popup.remove();
-    });
-
-    prevButton.addEventListener('click', () => {
-        if (currentIndex > 0) {
-            currentIndex--;
-            message.innerText = `Deleted Address: ${deletedEmails[currentIndex]}`;
-            nextButton.disabled = currentIndex === deletedEmails.length - 1;
-            prevButton.disabled = currentIndex === 0;
-        }
-    });
-
-    nextButton.addEventListener('click', () => {
-        if (currentIndex < deletedEmails.length - 1) {
-            currentIndex++;
-            message.innerText = `Deleted Address: ${deletedEmails[currentIndex]}`;
-            prevButton.disabled = currentIndex === 0;
-            nextButton.disabled = currentIndex === deletedEmails.length - 1;
-        }
-    });
-
-    popup.appendChild(message);
-    popup.appendChild(navigation);
-    popup.appendChild(okButton);
-    document.body.appendChild(popup);
-}
         function saveText() {
             const inputText = document.getElementById('inputText').value;
             const roughText = document.getElementById('roughText').value;
@@ -1175,6 +1082,7 @@ function displayDeletedAddressesPopup(deletedEmails) {
     const russiaEntries = [];
 
     const gapOption = document.getElementById('gapOption').value;
+    const toOption = document.querySelector('input[name="toOption"]:checked').value;
 
     function processChunk() {
         const chunkSize = 10;
@@ -1192,7 +1100,9 @@ function displayDeletedAddressesPopup(deletedEmails) {
                 }
 
                 let processedParagraph = lines.join('\n');
-                processedParagraph = `To\n${processedParagraph}`; // Always include "To" prefix.
+                if (toOption === 'withTo') {
+                    processedParagraph = `To\n${processedParagraph}`;
+                }
 
                 const greeting = `Dear Professor ${lastName},\n`;
                 let fullText = gapOption === 'nil' ?
@@ -1242,9 +1152,15 @@ function displayDeletedAddressesPopup(deletedEmails) {
 
     const effectType = document.getElementById('effectType').value;
     const effectsEnabled = document.getElementById('effectsToggle').checked;
+    
+    // Check the 'toOption' selection to determine prefix handling
+    const toOption = document.querySelector('input[name="toOption"]:checked').value;
 
-    // Always remove "To\n" prefix if present.
-    let textToProcess = textToCopy.replace(/^To\n/, '');
+    // Check and remove 'To\n' if 'With "To"' is selected
+    let textToProcess = textToCopy;
+    if (toOption === 'withTo' && textToCopy.startsWith("To\n")) {
+        textToProcess = textToCopy.replace(/^To\n/, '');  // Remove "To\n" prefix if present
+    }
 
     if (effectsEnabled && effectType !== 'none') {
         paragraph.classList.add(effectType);
