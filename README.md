@@ -759,7 +759,7 @@ body {
     <!-- Incomplete Entries Box -->
     <div class="input-container" style="display:none;">
         <div class="container-header" onclick="toggleBox('incompleteBox')">
-            Incomplete Entries
+            Incomplete Entries/Removed Countries
             <span id="incompleteBoxToggle">[+]</span>
         </div>
         <div id="incompleteBox" class="input-boxes">
