@@ -118,6 +118,63 @@ body {
             border-bottom: 1px solid #e0e0e0;
             line-height: 1.5;
         }
+		/* Toggle Switch Style */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #1171ba;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    }
+
+#dearProfessorLabel {
+    font-size: 14px;
+    color: #333;
+}
 
         #undoButton,
         #lockButton {
@@ -643,10 +700,13 @@ body {
     </div>
             			<div class="button-container">
     <input type="email" id="unsubscribedEmail" placeholder="Enter Unsubscribed Email" class="input-box">
-    <button onclick="saveUnsubscribedEmail()" id="exportButton" class="btn save">Save</button>
     
-    <button onclick="deleteUnsubscribedEntries()" id="deleteButton" class="btn delete">
-        Delete Unsubscribed Ad
+    <button onclick="saveUnsubscribedEmail()" id="exportButton" class="btn save">
+        Save
+    </button>
+    
+    <button onclick="deleteUnsubscribedEntries()" class="btn delete">
+         Delete Unsubscribed Ad ✘
     </button>
     
     <button onclick="window.open('https://docs.google.com/document/d/14AIqhs3wQ_T0hV7YNH2ToBRBH1MEkzmunw2e9WNgeo8/edit?tab=t.0', '_blank')" 
@@ -654,15 +714,18 @@ body {
         Email List
     </button>
     
-    <label for="greetingToggle" class="btn toggle">
-        <input type="checkbox" id="greetingToggle" checked onchange="toggleGreeting()">
-        Dear Professor
-    </label>
-    
     <button onclick="window.open('https://docs.google.com/spreadsheets/d/10OYn06bPKVXmf__3d9Q_7kky8VHRlIKO/edit?gid=1887922208#gid=1887922208', '_blank')" class="btn google">
-        Ad Progress
+        Update Ad Progress
     </button>
 </div>
+<div class="toggle-container">
+    <label class="switch">
+        <input type="checkbox" id="dearProfessorToggle" onchange="toggleDearProfessor()">
+        <span class="slider round"></span>
+    </label>
+    <span id="dearProfessorLabel">Include "Dear Professor"</span>
+</div>
+
 
 <div id="successMessage" class="success-message" style="display: none;">Email saved successfully!</div>
 <!-- CSS Section -->
@@ -724,29 +787,6 @@ body {
 /* Email list button */
 .btn.email-list {
     background-color: #0B6623; /* Green color */
-}
-
-.btn.toggle {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 10px 15px;
-    font-size: 14px;
-    border-radius: 5px;
-    background-color: #1171BA;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-.btn.toggle input {
-    width: 15px;
-    height: 15px;
-    cursor: pointer;
-}
-
-.btn.toggle:hover {
-    background-color: #0B4F87;
 }
 
 .btn.email-list:hover {
@@ -875,20 +915,6 @@ body {
     }, 3000); // Hide the message after 3 seconds
 }
 
-// Function to start the blinking effect
-function startButtonBlink() {
-    const deleteButton = document.getElementById('deleteButton');
-    deleteButton.classList.add('blinking');
-}
-
-// Function to stop the blinking effect
-function stopButtonBlink() {
-    const deleteButton = document.getElementById('deleteButton');
-    deleteButton.classList.remove('blinking');
-}
-
-
-
 // Google Sheets Configuration
 const SHEET_ID = 'SHEET-ID';
 const API_KEY = 'Enter-API';
@@ -953,29 +979,31 @@ document.addEventListener('DOMContentLoaded', fetchUnsubscribedEmails);
 // Delete paragraphs containing unsubscribed emails
 function deleteUnsubscribedEntries() {
     const outputContainer = document.getElementById('output');
-    const paragraphs = Array.from(outputContainer.querySelectorAll('p'));
+    const paragraphs = outputContainer.querySelectorAll('p');
     const unsubscribedEmails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
-    const deletedEmails = [];
+    const inputTextBox = document.getElementById('inputText');
+    let inputText = inputTextBox.value;
+    let deletedCount = 0;
 
-    // Iterate and remove paragraphs containing unsubscribed emails
     paragraphs.forEach(paragraph => {
         unsubscribedEmails.forEach(email => {
-            if (paragraph.innerText.includes(email)) {
+            if (paragraph.innerHTML.includes(email)) {
+                // Remove the paragraph from the output container
                 paragraph.remove();
-                deletedEmails.push(email);
+                // Remove the email from the input text box
+                const paragraphText = paragraph.innerText;
+                inputText = inputText.replace(paragraphText, '').trim();
+                deletedCount++;
             }
         });
     });
 
-    if (deletedEmails.length > 0) {
-        displayDeletedAddressesPopup(deletedEmails); // Show popup for deleted addresses
-    }
+    // Update the input text box after processing
+    inputTextBox.value = inputText;
 
-    // Update button count
-    updateUnsubscribedCount();
-
-    // Show success message with the number of deleted addresses
-    showSuccessMessage(`Successfully Deleted ${deletedEmails.length} unsubscribed addresses.`);
+    // Save the changes and show success message
+    saveText();
+    showSuccessMessage(`Successfully Deleted ${deletedCount} addresses.`);
 }
 
         let currentUser = null;
@@ -1269,7 +1297,38 @@ function displayDeletedAddressesPopup(deletedEmails) {
             document.getElementById('completionPercentage').innerText = `${percentageCompleted}%`;
         }
 
-        function processText() {
+        let includeDearProfessor = true;
+
+// Initialize the toggle state from localStorage
+document.addEventListener('DOMContentLoaded', () => {
+    const savedState = localStorage.getItem('includeDearProfessor');
+    if (savedState !== null) {
+        includeDearProfessor = savedState === 'true';
+        document.getElementById('dearProfessorToggle').checked = includeDearProfessor;
+        updateToggleLabel();
+    }
+});
+
+function toggleDearProfessor() {
+    includeDearProfessor = document.getElementById('dearProfessorToggle').checked;
+    localStorage.setItem('includeDearProfessor', includeDearProfessor);
+    updateToggleLabel();
+}
+
+function updateToggleLabel() {
+    const label = document.getElementById('dearProfessorLabel');
+    label.innerText = includeDearProfessor ? '✔ "Dear Professor"' : '✘ "Dear Professor"';
+}
+
+
+// Update the toggle button text
+function updateToggleUI() {
+    const toggleButton = document.querySelector('.btn.toggle-dear-professor');
+    toggleButton.innerText = includeDearProfessor ? 'Exclude "Dear Professor"' : 'Include "Dear Professor"';
+}
+
+// Update processText function to include/exclude "Dear Professor"
+function processText() {
     if (isProcessing) return;
 
     isProcessing = true;
@@ -1299,19 +1358,22 @@ function displayDeletedAddressesPopup(deletedEmails) {
                 let firstLine = lines[0].trim();
                 let lastName = firstLine.split(' ').pop();
 
-                if (!firstLine.toLowerCase().startsWith('professor')) {
-                    firstLine = `<span class="highlight-added">Professor</span> ${firstLine}`;
-                    lines[0] = firstLine;
+                // Check if the toggle is ON and add "Dear Professor" after the email
+                if (includeDearProfessor) {
+                    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+                    const emailLineIndex = lines.findIndex(line => emailRegex.test(line));
+                    if (emailLineIndex !== -1) {
+                        const greeting = `Dear Professor ${lastName},`;
+                        if (gapOption === 'nil') {
+                            lines.splice(emailLineIndex + 1, 0, greeting); // Insert with no gap
+                        } else {
+                            lines.splice(emailLineIndex + 1, 0, '', greeting); // Insert with gap
+                        }
+                    }
                 }
 
                 let processedParagraph = lines.join('\n');
-
-                const greeting = `Dear Professor ${lastName},\n`;
-                let fullText = gapOption === 'nil' ?
-                    processedParagraph + '\n' + greeting : processedParagraph + '\n\n' + greeting;
-
-                fullText = highlightUnsubscribed(fullText); // Highlight unsubscribed emails
-                const highlightedText = highlightErrors(fullText.replace(/\n/g, '<br>'));
+                const highlightedText = highlightErrors(processedParagraph.replace(/\n/g, '<br>'));
                 const hasError = highlightedText.includes('error');
 
                 if (hasError) {
@@ -1335,16 +1397,16 @@ function displayDeletedAddressesPopup(deletedEmails) {
             russiaEntries.forEach(entry => outputContainer.appendChild(entry));
 
             updateCounts();
-    saveText();
-    document.getElementById('loadingIndicator').style.display = 'none';
-    isProcessing = false;
-
-    // Start blinking the delete button
-    startButtonBlink();
-}
+            saveText();
+            document.getElementById('lockButton').style.display = 'inline-block';
+            document.getElementById('loadingIndicator').style.display = 'none';
+            isProcessing = false;
+        }
     }
     requestAnimationFrame(processChunk);
 }
+
+
 
         function cutParagraph(paragraph) {
     if (cutCooldown) return;
@@ -1832,190 +1894,7 @@ function syncEmailWithGoogleSheets(email) {
 }
 
 		}
-		let includeGreeting = true;
-
-    // Update greeting toggle state
-    function toggleGreeting() {
-        includeGreeting = document.getElementById('greetingToggle').checked;
-        console.log("Greeting Included:", includeGreeting);
-    }
-
-    // Fetch and display unsubscribed email count
-    function updateUnsubscribedCount() {
-    const outputContainer = document.getElementById('output');
-    const paragraphs = outputContainer.querySelectorAll('p');
-    const unsubscribedEmails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
-
-    // Count paragraphs that contain unsubscribed emails
-    let count = 0;
-    paragraphs.forEach(paragraph => {
-        unsubscribedEmails.forEach(email => {
-            if (paragraph.innerText.includes(email)) {
-                count++;
-            }
-        });
-    });
-
-    // Update the button text with the count
-    const deleteButton = document.getElementById('deleteButton');
-    deleteButton.innerText = `Delete Unsubscribed Ad`;
-}
-
-
-    // Update greeting text inclusion during processing
-    function processText() {
-        if (isProcessing) return;
-        isProcessing = true;
-        document.getElementById('loadingIndicator').style.display = 'inline';
-
-        const inputText = document.getElementById('inputText').value;
-        const paragraphs = inputText.split(/\n\s*\n/);
-        const outputContainer = document.getElementById('output');
-        outputContainer.innerHTML = '<p id="cursorStart">Place your cursor here</p>';
-
-        let index = 0;
-
-        function processChunk() {
-            const chunkSize = 10;
-            const end = Math.min(index + chunkSize, paragraphs.length);
-            for (; index < end; index++) {
-                let paragraph = paragraphs[index].trim();
-                if (paragraph !== '') {
-                    const lines = paragraph.split('\n');
-                    const firstLine = lines[0].trim();
-                    const lastName = firstLine.split(' ').pop();
-
-                    // Include or exclude greeting text based on toggle
-                    const greeting = includeGreeting ? `Dear Professor ${lastName},\n` : '';
-                    const processedParagraph = `${lines.join('\n')}\n\n${greeting}`;
-
-                    const p = document.createElement('p');
-                    p.innerText = processedParagraph;
-                    outputContainer.appendChild(p);
-                }
-            }
-            if (index < paragraphs.length) {
-                requestAnimationFrame(processChunk);
-            } else {
-                updateCounts();
-                saveText();
-                document.getElementById('loadingIndicator').style.display = 'none';
-                isProcessing = false;
-            }
-        }
-        requestAnimationFrame(processChunk);
-    }
-
-    // Delete unsubscribed entries and update count
-    function deleteUnsubscribedEntries() {
-    const outputContainer = document.getElementById('output');
-    const paragraphs = Array.from(outputContainer.querySelectorAll('p'));
-    const unsubscribedEmails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
-    const deletedEmails = [];
-
-    paragraphs.forEach(paragraph => {
-        unsubscribedEmails.forEach(email => {
-            if (paragraph.innerText.includes(email)) {
-                paragraph.remove();
-                deletedEmails.push(email);
-            }
-        });
-    });
-
-    if (deletedEmails.length > 0) {
-        displayDeletedAddressesPopup(deletedEmails);
-    }
-
-    updateUnsubscribedCount(); // Update the delete button count
-     showSuccessMessage(`Successfully Deleted ${deletedEmails.length} unsubscribed addresses.`);
-
-    // Stop blinking the delete button
-    stopButtonBlink();
-}
-// Function to display a popup for deleted addresses
-function displayDeletedAddressesPopup(deletedEmails) {
-    let currentIndex = 0;
-
-    const popup = document.createElement('div');
-    popup.style.cssText = `
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: #2c3e50;
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        z-index: 1000;
-        text-align: center;
-    `;
-
-    const message = document.createElement('div');
-    message.style.fontSize = '18px';
-    message.innerText = `Deleted Address: ${deletedEmails[currentIndex]}`;
-
-    const navigation = document.createElement('div');
-    navigation.style.margin = '10px 0';
-
-    const prevButton = document.createElement('button');
-    prevButton.innerText = '<';
-    prevButton.disabled = currentIndex === 0;
-    prevButton.style.marginRight = '10px';
-
-    const nextButton = document.createElement('button');
-    nextButton.innerText = '>';
-    nextButton.disabled = currentIndex === deletedEmails.length - 1;
-
-    navigation.appendChild(prevButton);
-    navigation.appendChild(nextButton);
-
-    const okButton = document.createElement('button');
-    okButton.innerText = 'OK';
-    okButton.style.marginTop = '10px';
-    okButton.style.backgroundColor = '#28a745';
-    okButton.style.color = 'white';
-    okButton.style.border = 'none';
-    okButton.style.padding = '10px 20px';
-    okButton.style.cursor = 'pointer';
-    okButton.style.borderRadius = '5px';
-
-    okButton.addEventListener('click', () => {
-        popup.remove();
-    });
-
-    prevButton.addEventListener('click', () => {
-        if (currentIndex > 0) {
-            currentIndex--;
-            message.innerText = `Deleted Address: ${deletedEmails[currentIndex]}`;
-            nextButton.disabled = currentIndex === deletedEmails.length - 1;
-            prevButton.disabled = currentIndex === 0;
-        }
-    });
-
-    nextButton.addEventListener('click', () => {
-        if (currentIndex < deletedEmails.length - 1) {
-            currentIndex++;
-            message.innerText = `Deleted Address: ${deletedEmails[currentIndex]}`;
-            prevButton.disabled = currentIndex === 0;
-            nextButton.disabled = currentIndex === deletedEmails.length - 1;
-        }
-    });
-
-    popup.appendChild(message);
-    popup.appendChild(navigation);
-    popup.appendChild(okButton);
-    document.body.appendChild(popup);
-}
-
-// Update unsubscribed count on page load
-document.addEventListener('DOMContentLoaded', updateUnsubscribedCount);
-
-</script>
+ </script>
 </body>
 
 </html>
