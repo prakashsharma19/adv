@@ -886,7 +886,7 @@ input:checked + .slider:before {
     </div>
 
     <div id="reminderPopup" class="popup">
-        <span style="font-size: 50px;">??</span>
+        <span style="font-size: 50px;">⏰</span>
         <p>Send Ads</p>
         <button onclick="dismissPopup()">OK</button>
     </div>
