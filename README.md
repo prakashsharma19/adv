@@ -1006,8 +1006,8 @@ function deleteUnsubscribedEntries() {
         let cutCooldown = false;
 
         function clearMemory() {
-            const password = prompt('Please enter the password to clear memory:');
-            if (password === 'cleanall') {
+            const password = prompt('Please enter the password to clear memory, unsubscribed email data will also be deleted:');
+            if (password === 'cleanall0') {
                 localStorage.clear();
                 alert('Memory cleared!');
             } else {
