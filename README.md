@@ -981,30 +981,21 @@ function deleteUnsubscribedEntries() {
     const outputContainer = document.getElementById('output');
     const paragraphs = outputContainer.querySelectorAll('p');
     const unsubscribedEmails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
-    const inputTextBox = document.getElementById('inputText');
-    let inputText = inputTextBox.value;
     let deletedCount = 0;
 
     paragraphs.forEach(paragraph => {
         unsubscribedEmails.forEach(email => {
             if (paragraph.innerHTML.includes(email)) {
-                // Remove the paragraph from the output container
                 paragraph.remove();
-                // Remove the email from the input text box
-                const paragraphText = paragraph.innerText;
-                inputText = inputText.replace(paragraphText, '').trim();
                 deletedCount++;
             }
         });
     });
 
-    // Update the input text box after processing
-    inputTextBox.value = inputText;
-
-    // Save the changes and show success message
-    saveText();
-    showSuccessMessage(`Successfully Deleted ${deletedCount} addresses.`);
+    saveText(); // Save changes after deleting
+    return deletedCount; // Return the number of deleted entries
 }
+
 
         let currentUser = null;
         let dailyAdCount = 0;
@@ -1044,6 +1035,45 @@ function deleteUnsubscribedEntries() {
 
     saveText();
     showSuccessMessage(`Successfully Deleted ${deletedEmails.length} addresses.`);
+}
+
+function showPopupNotification(message) {
+    const popup = document.createElement('div');
+    popup.style.cssText = `
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #1171ba;
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+    `;
+    popup.innerText = message;
+
+    const closeButton = document.createElement('button');
+    closeButton.innerText = 'OK';
+    closeButton.style.cssText = `
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: white;
+        color: #1171ba;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    `;
+    closeButton.onclick = () => {
+        popup.remove();
+    };
+
+    popup.appendChild(closeButton);
+    document.body.appendChild(popup);
 }
 
 // Function to display popup for deleted addresses
@@ -1358,16 +1388,15 @@ function processText() {
                 let firstLine = lines[0].trim();
                 let lastName = firstLine.split(' ').pop();
 
-                // Check if the toggle is ON and add "Dear Professor" after the email
                 if (includeDearProfessor) {
                     const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
                     const emailLineIndex = lines.findIndex(line => emailRegex.test(line));
                     if (emailLineIndex !== -1) {
                         const greeting = `Dear Professor ${lastName},`;
                         if (gapOption === 'nil') {
-                            lines.splice(emailLineIndex + 1, 0, greeting); // Insert with no gap
+                            lines.splice(emailLineIndex + 1, 0, greeting);
                         } else {
-                            lines.splice(emailLineIndex + 1, 0, '', greeting); // Insert with gap
+                            lines.splice(emailLineIndex + 1, 0, '', greeting);
                         }
                     }
                 }
@@ -1400,11 +1429,21 @@ function processText() {
             saveText();
             document.getElementById('lockButton').style.display = 'inline-block';
             document.getElementById('loadingIndicator').style.display = 'none';
+
+            // Automatically delete unsubscribed entries
+            const deletedCount = deleteUnsubscribedEntries();
+
+            // Show a popup notification if unsubscribed entries were deleted
+            if (deletedCount > 0) {
+                showPopupNotification(`Deleted ${deletedCount} unsubscribed entries.`);
+            }
+
             isProcessing = false;
         }
     }
     requestAnimationFrame(processChunk);
 }
+
 
 
 
