@@ -1386,6 +1386,13 @@ function processText() {
             if (paragraph !== '') {
                 const lines = paragraph.split('\n');
                 let firstLine = lines[0].trim();
+
+                // Ensure the first line starts with "Professor"
+                if (!firstLine.startsWith('Professor')) {
+                    firstLine = `Professor ${firstLine}`;
+                    lines[0] = firstLine;
+                }
+
                 let lastName = firstLine.split(' ').pop();
 
                 if (includeDearProfessor) {
@@ -1443,6 +1450,7 @@ function processText() {
     }
     requestAnimationFrame(processChunk);
 }
+
 
 
 
