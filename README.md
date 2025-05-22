@@ -620,6 +620,54 @@ input:checked + .slider:before {
             justify-content: flex-end;
             margin-top: 10px;
         }
+
+        /* Country toggle styles */
+        .country-toggle {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .country-toggle-label {
+            margin-left: 10px;
+            font-size: 14px;
+        }
+
+        .country-toggle-container {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        .country-toggle-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .country-toggle-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-toggle-actions button {
+            padding: 2px 8px;
+            font-size: 12px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        .country-toggle-actions button:hover {
+            background-color: #e9ecef;
+        }
     </style>
 </head>
 
@@ -726,6 +774,17 @@ input:checked + .slider:before {
     <span id="dearProfessorLabel">Include "Dear Professor"</span>
 </div>
 
+<!-- Country Toggle Container -->
+<div id="countryToggleContainer" class="country-toggle-container" style="display:none;">
+    <div class="country-toggle-header">
+        <span>Filter Countries</span>
+        <div class="country-toggle-actions">
+            <button onclick="toggleAllCountries(true)">All</button>
+            <button onclick="toggleAllCountries(false)">None</button>
+        </div>
+    </div>
+    <!-- Country toggles will be added here dynamically -->
+</div>
 
 <div id="successMessage" class="success-message" style="display: none;">Email saved successfully!</div>
 <!-- CSS Section -->
@@ -902,8 +961,141 @@ input:checked + .slider:before {
     <script>
     const countryList = [
         "Afghanistan", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia",
-        "Bahamas", "Bahrain", "Barbados", "Belize", "Benin", "Bolivia", "Bosnia and Herzegovina", "Brazil", "Brasil", "Brunei", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Canada", "Central African Republic", "Chad", "Tchad", "Chile", "Colombia", "Comoros", "Congo", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Eswatini", "Fiji", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "India", "Indonesia", "Iraq", "Ireland", "Italy", "Jamaica", "Japan", "Jordan", "Kenya", "Kiribati", "Kuwait", "Laos", "Latvia", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Montenegro", "Morocco", "Mozambique", "Namibia", "Nauru", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Oman", "Pakistan", "Palau", "Palestine", "Philippines", "Qatar", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Seychelles", "Sierra Leone", "Solomon Islands", "Somalia", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Switzerland", "Syria", "Taiwan", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "United Arab Emirates", "United States", "Vanuatu", "Vatican City", "Vietnam", "Yemen", "USA", "U.S.A.", "U.S.A", "U. S. A.", "U. S. A", "Korea", "UAE", "U.A.E.", "U. A. E", "U. A. E.", "Hong Kong", "Ivory Coast", "Cote d'Ivoire", "Côte d'Ivoire", "Cote D'Ivoire", "Macau", "Macao", "Macedonia", "Greece", "Albania", "Austria", "Azerbaijan", "Bangladesh", "Belgium", "Bhutan", "Botswana", "Bulgaria", "Cameroon", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Ethiopia", "Finland", "Hungary", "Iceland", "Iran", "Israel", "Kazakhstan", "Kyrgyzstan", "Lebanon", "Lithuania", "Maldives", "Mongolia", "Myanmar", "Burma", "Nepal", "Netherlands", "New Zealand", "Norway", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Poland", "Portugal", "Romania", "Serbia", "Singapore", "Slovakia", "Slovenia", "Sweden", "Tajikistan", "Tanzania", "Ukraine", "United Kingdom", "Uruguay", "Uzbekistan", "Venezuela", "Zambia", "Zimbabwe", "UK", "U.K.", "Viet Nam", "Belarus", "South Africa"
+        "Bahamas", "Bahrain", "Barbados", "Belize", "Benin", "Bolivia", "Bosnia and Herzegovina", "Brazil", "Brasil", "Brunei", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Canada", "Central African Republic", "Chad", "Tchad", "Chile", "China", "Colombia", "Comoros", "Congo", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Eswatini", "Fiji", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "India", "Indonesia", "Iraq", "Ireland", "Italy", "Jamaica", "Japan", "Jordan", "Kenya", "Kiribati", "Kuwait", "Laos", "Latvia", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Montenegro", "Morocco", "Mozambique", "Namibia", "Nauru", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Oman", "Pakistan", "Palau", "Palestine", "Philippines", "Qatar", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Seychelles", "Sierra Leone", "Solomon Islands", "Somalia", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Switzerland", "Syria", "Taiwan", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "United Arab Emirates", "United States", "Vanuatu", "Vatican City", "Vietnam", "Yemen", "USA", "U.S.A.", "U.S.A", "U. S. A.", "U. S. A", "Korea", "UAE", "U.A.E.", "U. A. E", "U. A. E.", "Hong Kong", "Ivory Coast", "Cote d'Ivoire", "Côte d'Ivoire", "Cote D'Ivoire", "Macau", "Macao", "Macedonia", "Greece", "Albania", "Austria", "Azerbaijan", "Bangladesh", "Belgium", "Bhutan", "Botswana", "Bulgaria", "Cameroon", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Ethiopia", "Finland", "Hungary", "Iceland", "Iran", "Israel", "Kazakhstan", "Kyrgyzstan", "Lebanon", "Lithuania", "Maldives", "Mongolia", "Myanmar", "Burma", "Nepal", "Netherlands", "New Zealand", "Norway", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Poland", "Portugal", "Romania", "Serbia", "Singapore", "Slovakia", "Slovenia", "Sweden", "Tajikistan", "Tanzania", "Ukraine", "United Kingdom", "Uruguay", "Uzbekistan", "Venezuela", "Zambia", "Zimbabwe", "UK", "U.K.", "Viet Nam", "Belarus", "South Africa"
     ];
+
+    // Country filter state
+    let countryFilterState = {};
+
+    // Initialize country filter state
+    function initializeCountryFilter() {
+        countryList.forEach(country => {
+            countryFilterState[country] = true; // Default to true (enabled)
+        });
+        
+        // Load saved state from localStorage
+        const savedState = localStorage.getItem('countryFilterState');
+        if (savedState) {
+            const parsedState = JSON.parse(savedState);
+            Object.keys(parsedState).forEach(country => {
+                if (countryFilterState.hasOwnProperty(country)) {
+                    countryFilterState[country] = parsedState[country];
+                }
+            });
+        }
+        
+        renderCountryToggles();
+    }
+
+    // Render country toggles in the UI
+    function renderCountryToggles() {
+        const container = document.getElementById('countryToggleContainer');
+        container.innerHTML = `
+            <div class="country-toggle-header">
+                <span>Filter Countries</span>
+                <div class="country-toggle-actions">
+                    <button onclick="toggleAllCountries(true)">All</button>
+                    <button onclick="toggleAllCountries(false)">None</button>
+                </div>
+            </div>
+        `;
+        
+        // Sort countries alphabetically
+        const sortedCountries = Object.keys(countryFilterState).sort();
+        
+        sortedCountries.forEach(country => {
+            const toggle = document.createElement('div');
+            toggle.className = 'country-toggle';
+            toggle.innerHTML = `
+                <label class="switch">
+                    <input type="checkbox" id="toggle-${country.replace(/\s+/g, '-')}" 
+                           ${countryFilterState[country] ? 'checked' : ''} 
+                           onchange="toggleCountry('${country}', this.checked)">
+                    <span class="slider round"></span>
+                </label>
+                <span class="country-toggle-label">${country}</span>
+            `;
+            container.appendChild(toggle);
+        });
+    }
+
+    // Toggle a single country
+    function toggleCountry(country, isEnabled) {
+        countryFilterState[country] = isEnabled;
+        saveCountryFilterState();
+        filterOutputByCountries();
+    }
+
+    // Toggle all countries
+    function toggleAllCountries(enable) {
+        Object.keys(countryFilterState).forEach(country => {
+            countryFilterState[country] = enable;
+        });
+        saveCountryFilterState();
+        renderCountryToggles();
+        filterOutputByCountries();
+    }
+
+    // Save the current filter state to localStorage
+    function saveCountryFilterState() {
+        localStorage.setItem('countryFilterState', JSON.stringify(countryFilterState));
+    }
+
+    // Filter the output based on enabled countries
+    function filterOutputByCountries() {
+        const outputContainer = document.getElementById('output');
+        const paragraphs = outputContainer.querySelectorAll('p');
+        
+        paragraphs.forEach(paragraph => {
+            let hasEnabledCountry = false;
+            const text = paragraph.innerText;
+            
+            // Check if the paragraph contains any enabled country
+            for (const country in countryFilterState) {
+                if (countryFilterState[country] && text.includes(country)) {
+                    hasEnabledCountry = true;
+                    break;
+                }
+            }
+            
+            // Show/hide paragraph based on country filter
+            paragraph.style.display = hasEnabledCountry ? '' : 'none';
+        });
+        
+        updateCounts();
+    }
+
+    // Update counts to reflect only visible entries
+    function updateCounts() {
+        const outputContainer = document.getElementById('output');
+        const paragraphs = outputContainer.querySelectorAll('p');
+        let adCount = 0;
+
+        // Increment count based on the start of each paragraph ("To" or "Professor")
+        paragraphs.forEach(paragraph => {
+            if (paragraph.style.display !== 'none') {
+                const firstLine = paragraph.innerText.split('\n')[0];
+                if (firstLine.startsWith('To') || firstLine.startsWith('Professor')) {
+                    adCount += 1;
+                }
+            }
+        });
+
+        document.getElementById('totalAds').innerText = adCount;
+        document.getElementById('dailyAdCount').innerText = `Total Ads Today: ${dailyAdCount}`;
+
+        const text = outputContainer.innerText;
+        const countryCounts = countCountryOccurrences(text);
+        const sortedCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
+        let countryCountText = 'Country Counts:<br>';
+        sortedCountries.forEach(([country, count]) => {
+            countryCountText += `<b>${country}</b>: ${count}<br>`;
+        });
+        document.getElementById('countryCount').innerHTML = countryCountText.trim();
+
+        updateProgressBar(dailyAdCount);
+        updateRemainingTime(dailyAdCount);
+    }
 
 	function showSuccessMessage(message) {
     const successMessage = document.getElementById('successMessage');
@@ -1280,9 +1472,11 @@ function displayDeletedAddressesPopup(deletedEmails) {
 
     // Increment count based on the start of each paragraph ("To" or "Professor")
     paragraphs.forEach(paragraph => {
-        const firstLine = paragraph.innerText.split('\n')[0];
-        if (firstLine.startsWith('To') || firstLine.startsWith('Professor')) {
-            adCount += 1;
+        if (paragraph.style.display !== 'none') {
+            const firstLine = paragraph.innerText.split('\n')[0];
+            if (firstLine.startsWith('To') || firstLine.startsWith('Professor')) {
+                adCount += 1;
+            }
         }
     });
 
@@ -1337,6 +1531,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('dearProfessorToggle').checked = includeDearProfessor;
         updateToggleLabel();
     }
+    initializeCountryFilter();
 });
 
 function toggleDearProfessor() {
@@ -1437,7 +1632,10 @@ function processText() {
             document.getElementById('lockButton').style.display = 'inline-block';
             document.getElementById('loadingIndicator').style.display = 'none';
 
-            // Automatically delete unsubscribed entries
+            // Apply country filter after processing
+            filterOutputByCountries();
+
+                        // Automatically delete unsubscribed entries
             const deletedCount = deleteUnsubscribedEntries();
 
             // Show a popup notification if unsubscribed entries were deleted
@@ -1450,10 +1648,6 @@ function processText() {
     }
     requestAnimationFrame(processChunk);
 }
-
-
-
-
 
         function cutParagraph(paragraph) {
     if (cutCooldown) return;
@@ -1487,13 +1681,11 @@ function copyAndRemoveParagraph(paragraph, textToCopy, targetElementId) {
   const tempTextarea = document.createElement('textarea');
   tempTextarea.style.position = 'fixed';
   tempTextarea.style.opacity = '0';
-  tempTextarea.value   
- = textToCopy;
+  tempTextarea.value = textToCopy;
   document.body.appendChild(tempTextarea);
   tempTextarea.select();
   document.execCommand('copy');
-  document.body.removeChild(tempTextarea);   
-
+  document.body.removeChild(tempTextarea);
 
   paragraph.remove();
   cleanupSpaces();
@@ -1649,6 +1841,7 @@ function copyAndRemoveParagraph(paragraph, textToCopy, targetElementId) {
                 document.getElementById('countryCount').style.display = 'block';
                 document.getElementById('output').style.display = 'block';
                 document.getElementById('userControls').style.display = 'flex';
+                document.getElementById('countryToggleContainer').style.display = 'block';
                 document.getElementById('loggedInUser').innerText = username;
                 loadText();
             } else {
@@ -1668,6 +1861,7 @@ function copyAndRemoveParagraph(paragraph, textToCopy, targetElementId) {
             document.getElementById('countryCount').style.display = 'none';
             document.getElementById('output').style.display = 'none';
             document.getElementById('userControls').style.display = 'none';
+            document.getElementById('countryToggleContainer').style.display = 'none';
         }
 
         document.getElementById('output').addEventListener('click', function(event) {
@@ -1889,58 +2083,59 @@ function copyAndRemoveParagraph(paragraph, textToCopy, targetElementId) {
             if (savedOperationMode) {
                 document.querySelector(`input[name="cutOption"][value="${savedOperationMode}"]`).checked = true;
             }
-        // Function to export unsubscribed emails from localStorage as a JSON file
-function exportUnsubscribedEmails() {
-    console.log("Export button clicked");  // Debugging: Check if function is called
-
-    const emails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(emails));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "unsubscribed_emails.json");
-
-    // Get the export button and temporarily change its color and text
-    const exportButton = document.getElementById('exportButton');
-    if (exportButton) {
-        console.log("Export button found");  // Debugging: Verify the button element was found
-        exportButton.style.backgroundColor = 'green';
-        exportButton.innerText = 'Saved';
-
-        // Revert button color and text after 1 second
-        setTimeout(() => {
-            exportButton.style.backgroundColor = '#1171BA'; // Original color
-            exportButton.innerText = 'Export Unsubscribed Emails'; // Original text
-        }, 1000);
-    } else {
-        console.error("Export button not found");  // Error if the button ID is incorrect
-    }
-
-    // Trigger download
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    document.body.removeChild(downloadAnchor);
-}
-// Function to sync email with Google Sheets using the Google Apps Script web app
-function syncEmailWithGoogleSheets(email) {
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycbz3yehn7Fc6bDqqcEVptxwrUtl9XzFeAYM1iEte_4MBxZMPFI2D0vPfSYuMjkVb2iJg/exec'; // Replace with the URL from the deployment step
-
-    fetch(webAppUrl, {
-        method: 'POST',
-        body: JSON.stringify({ email: email }),
-        headers: {
-            'Content-Type': 'application/json'
         }
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Email synced with Google Sheets:", data);
-    })
-    .catch(error => {
-        console.error("Error syncing email:", error);
-    });
-}
 
-		}
+        // Function to export unsubscribed emails from localStorage as a JSON file
+        function exportUnsubscribedEmails() {
+            console.log("Export button clicked");  // Debugging: Check if function is called
+
+            const emails = JSON.parse(localStorage.getItem('permanentUnsubscribedEmails')) || [];
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(emails));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "unsubscribed_emails.json");
+
+            // Get the export button and temporarily change its color and text
+            const exportButton = document.getElementById('exportButton');
+            if (exportButton) {
+                console.log("Export button found");  // Debugging: Verify the button element was found
+                exportButton.style.backgroundColor = 'green';
+                exportButton.innerText = 'Saved';
+
+                // Revert button color and text after 1 second
+                setTimeout(() => {
+                    exportButton.style.backgroundColor = '#1171BA'; // Original color
+                    exportButton.innerText = 'Export Unsubscribed Emails'; // Original text
+                }, 1000);
+            } else {
+                console.error("Export button not found");  // Error if the button ID is incorrect
+            }
+
+            // Trigger download
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            document.body.removeChild(downloadAnchor);
+        }
+
+        // Function to sync email with Google Sheets using the Google Apps Script web app
+        function syncEmailWithGoogleSheets(email) {
+            const webAppUrl = 'https://script.google.com/macros/s/AKfycbz3yehn7Fc6bDqqcEVptxwrUtl9XzFeAYM1iEte_4MBxZMPFI2D0vPfSYuMjkVb2iJg/exec'; // Replace with the URL from the deployment step
+
+            fetch(webAppUrl, {
+                method: 'POST',
+                body: JSON.stringify({ email: email }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Email synced with Google Sheets:", data);
+            })
+            .catch(error => {
+                console.error("Error syncing email:", error);
+            });
+        }
  </script>
 </body>
 
